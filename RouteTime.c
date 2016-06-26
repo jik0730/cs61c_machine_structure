@@ -135,7 +135,6 @@ void parseSchedule(flightSys_t* s, FILE* schedule) {
 	    char arrivalStr[MAX_LINE_LEN];
 	    char priceStr[MAX_LINE_LEN];
 	    if(4!=sscanf(line,"%s %s %s $%s",dstName,departureStr,arrivalStr, priceStr)) { //parses the line as destination airport name, departure time, arrival time, and price
-		printf("fuck3\n");
 		printf("Skipping line: %s\n",line);
 		continue;
 	    }
