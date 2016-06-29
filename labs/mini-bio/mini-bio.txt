@@ -1,0 +1,57 @@
+/==================\
+| Student Mini-Bio |
+\==================/
+
+
+Name:		Ingyo Chung
+Login:		cs61c-bn
+E-mail:		jik0730s@berkeley.edu
+Section:	101
+
+
+Mini-Biography:
+==============
+Classes can sometimes feel so impersonal!  We created this mini-bio so we may get to know each other a little better. 
+This will be kept confidential amongst the staff, but you don't have to fill in anything you don't wish to.
+
+** The staff will answer them too, so how about you? **
+
+
+--> Where did you grow up? What was your academic path?
+(e.g. Did you live in the same town all your life or did you move around; and if so, where? Did you go to community college or another school before this one?)
+I was born in South Korea and have lived in Gumi, one small city in Korea. I am currently an exchange student from my home university, POSTECH. I have studied at Berkeley since Spring 2016.
+
+
+
+
+--> How much programming have you done (and what languages)?
+I learned of a little bit of computer science before becoming senior in my home university. After being senior, as a motivation of taking cs61b at Cal, I have been interested in computer science. Programming languages that I learned from taking cs courses are C, C++, Java. I studied some languages on my own, which are Python, html, css, javascript, PHP and those are not familiar to use for me because I didn't study those languages deeply. I have to have time to study more on those.
+
+
+
+
+--> What are your hobbies?
+My hobby is playing soccer and watching TV shows or movies.
+
+
+
+
+--> What are some of your talents and skills?
+Well, optimized thinking? which makes me live more comfortable. It makes annoyed things not happen.
+
+
+
+
+--> Have you done anything remarkable? Has anything really memorable happened to you?
+(e.g. travel, meeting famous people, 15 min of fame, inventions, overcoming adversity, etc.)
+I fulfilled military duty for 2 years.
+Every experiece in Cal is remarkable for me!
+
+
+
+
+
+--> What commitments will be consuming your cycles this term?
+(e.g. classes, jobs, family, commutes, volunteering, sports, student groups, etc.)
+Taking cs61c, cs188.
+Improving English speaking.
