@@ -24,14 +24,14 @@ struct flight {
 
 struct flightSys {
   airport_t* airport;
-    size_t size;
+  size_t size;
 };
 
 struct airport {
   char* name;
-    flight_t* flights;
-    airport_t* next;
-    size_t size;
+  flight_t* flights;
+  airport_t* next;
+  size_t size;
 };
 
 /*
@@ -58,6 +58,7 @@ flightSys_t* createSystem() {
     allocation_failed();
   }
 
+  flightSys->airport = NULL;
   flightSys->size = 0;
   return flightSys;
 }
@@ -90,6 +91,10 @@ void deleteSystem(flightSys_t* s) {
  */
 void addAirport(flightSys_t* s, char* name) {
   airport_t* airport = (airport_t*) malloc(1 * sizeof(airport_t)); // Allocate memory to airport.
+  if(airport == NULL) {
+    allocation_failed();
+  }
+
   char* a_name = (char*) malloc(sizeof(name)); // Allocate memory to a_name with the same size of a memory we received.
   if(a_name == NULL) { // In case of fail of memory allocation.
     allocation_failed();
@@ -97,6 +102,8 @@ void addAirport(flightSys_t* s, char* name) {
   strcpy(a_name, name); // String copy function to a_name from name.
   airport->name = a_name;
   airport->size = 0;
+  airport->flights = NULL;
+  airport->next = NULL;
 
   if(s->size == 0) {
     s->airport = airport;
@@ -163,6 +170,7 @@ void addFlight(airport_t* src, airport_t* dst, timeHM_t* departure, timeHM_t* ar
     src->flights->departure = *departure;
     src->flights->arrival = *arrival;
     src->flights->cost = cost;
+    src->flights->next = NULL;
     src->size++;
     return ;
   }
@@ -177,6 +185,7 @@ void addFlight(airport_t* src, airport_t* dst, timeHM_t* departure, timeHM_t* ar
   temp->next->departure = *departure;
   temp->next->arrival = *arrival;
   temp->next->cost = cost;
+  temp->next->next = NULL;
   src->size++;
   return ;
 }
@@ -223,13 +232,17 @@ bool getNextFlight(airport_t* src, airport_t* dst, timeHM_t* now, timeHM_t* depa
   }
 
   flight_t* temp = src->flights;
-  airport_t* toCompare = (airport_t*) malloc(sizeof(airport_t));
+  airport_t* toCompare = (airport_t*) malloc(1 * sizeof(airport_t));
   if(toCompare == NULL) {
     allocation_failed();
   }
+  toCompare->name = NULL;
+  toCompare->next = NULL;
+  toCompare->size = 0;
+  toCompare->flights = NULL;
 
   int costcomp = INT_MAX;
-  for(int i = 0; i < src->size; i ++) {
+  for(int i = 0; i < src->size; i++) {
     if(temp->cost < costcomp && isAfter(&temp->departure, now)) {
       costcomp = temp->cost;
     }
@@ -241,7 +254,7 @@ bool getNextFlight(airport_t* src, airport_t* dst, timeHM_t* now, timeHM_t* depa
   }
 
   temp = src->flights;
-  for(int i = 0; i < src->size; i ++) {
+  for(int i = 0; i < src->size; i++) {
     if(temp->cost == costcomp) {
       addFlight(toCompare, temp->dst, &temp->departure, &temp->arrival, temp->cost);
     }
@@ -250,7 +263,7 @@ bool getNextFlight(airport_t* src, airport_t* dst, timeHM_t* now, timeHM_t* depa
 
   temp = toCompare->flights;
   flight_t* pointer = temp;
-  for(int i = 0; i < toCompare->size; i ++) {
+  for(int i = 0; i < toCompare->size; i++) {
     if(isAfter(&pointer->departure, &temp->departure)) {
       pointer = temp;
     }
@@ -261,12 +274,14 @@ bool getNextFlight(airport_t* src, airport_t* dst, timeHM_t* now, timeHM_t* depa
   *arrival = pointer->arrival;
   *cost = pointer->cost;
 
-  //free(toCompare);
+  freeFlights(toCompare->flights);
+  freeAirport(toCompare);
   return true;
 }
 
 void freeAirport(airport_t* airport) {
   if(airport) {
+    free(airport->name);
     freeAirport(airport->next);
     free(airport);
   }
