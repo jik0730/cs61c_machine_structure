@@ -281,7 +281,9 @@ bool getNextFlight(airport_t* src, airport_t* dst, timeHM_t* now, timeHM_t* depa
 
 void freeAirport(airport_t* airport) {
   if(airport) {
-    free(airport->name);
+    if(airport->name != NULL) {
+      free(airport->name);
+    }
     freeAirport(airport->next);
     free(airport);
   }
