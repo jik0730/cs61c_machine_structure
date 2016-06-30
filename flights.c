@@ -1,30 +1,49 @@
 /* 
  * CS61C Summer 2016
- * Name:
- * Login:
+ * Name: Ingyo Chung
+ * Login: bn
  */
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <limits.h>
 #include "flights.h"
 #include "timeHM.h"
 
-struct flightSys {
+typedef struct flight flight_t;
 
+struct flight {
+  airport_t* src;
+  airport_t* dst;
+  timeHM_t departure;
+  timeHM_t arrival;
+  int cost;
+  flight_t* next;
+};
+
+struct flightSys {
+  airport_t* airport;
+    size_t size;
 };
 
 struct airport {
-
+  char* name;
+    flight_t* flights;
+    airport_t* next;
+    size_t size;
 };
 
 /*
    This should be called if memory allocation failed.
  */
 static void allocation_failed() {
-    fprintf(stderr, "Out of memory.\n");
-    exit(EXIT_FAILURE);
+  fprintf(stderr, "Out of memory.\n");
+  exit(EXIT_FAILURE);
 }
+
+void freeAirport(airport_t* airport);
+void freeFlights(flight_t* flights);
 
 
 /*
@@ -32,8 +51,15 @@ static void allocation_failed() {
    Returns a pointer to the system created.
  */
 flightSys_t* createSystem() {
-    // Replace this line with your code
-    return NULL;
+  flightSys_t* flightSys;
+  flightSys = (flightSys_t*) malloc(1 * sizeof(flightSys_t)); // Create single flight system.
+
+  if(flightSys == NULL) { // In case of fail of memory allocation.
+    allocation_failed();
+  }
+
+  flightSys->size = 0;
+  return flightSys;
 }
 
 
@@ -41,7 +67,20 @@ flightSys_t* createSystem() {
    Frees all memory associated with this system; that's all memory you dynamically allocated in your code.
  */
 void deleteSystem(flightSys_t* s) {
-    // Replace this line with your code
+  // Recursively delete system.
+  if(s == NULL || s->size == 0) { // Base case of recursive function.
+    return ;
+  }
+
+  airport_t* temp = s->airport;
+  for(int i = 0; i < s->size; i++) {
+    freeFlights(temp->flights);
+    temp = temp->next;
+  }
+  freeAirport(s->airport);
+  free(s); // Free.
+
+  return ;
 }
 
 
@@ -50,7 +89,27 @@ void deleteSystem(flightSys_t* s) {
    Do not store "name" (the pointer) as the contents it point to may change.
  */
 void addAirport(flightSys_t* s, char* name) {
-    // Replace this line with your code
+  airport_t* airport = (airport_t*) malloc(1 * sizeof(airport_t)); // Allocate memory to airport.
+  char* a_name = (char*) malloc(sizeof(name)); // Allocate memory to a_name with the same size of a memory we received.
+  if(a_name == NULL) { // In case of fail of memory allocation.
+    allocation_failed();
+  }
+  strcpy(a_name, name); // String copy function to a_name from name.
+  airport->name = a_name;
+  airport->size = 0;
+
+  if(s->size == 0) {
+    s->airport = airport;
+    s->size++;
+  } else {
+    airport_t* temp = s->airport;
+    for(int i = 0; i < s->size - 1; i++) {
+      temp = temp->next;
+    }
+    temp->next = airport;
+    s->size++;
+  }
+  return ;
 }
 
 
@@ -59,8 +118,19 @@ void addAirport(flightSys_t* s, char* name) {
    If the airport doesn't exist, return NULL.
  */
 airport_t* getAirport(flightSys_t* s, char* name) {
-    // Replace this line with your code
+  if(s->size == 0) {
     return NULL;
+  }
+
+  airport_t* temp = s->airport;
+  for(int i = 0; i < s->size; i++) {
+    if(strcmp(temp->name, name) == 0) {
+      return temp;
+    }
+    temp = temp->next;
+  }
+
+  return NULL;
 }
 
 
@@ -70,7 +140,15 @@ airport_t* getAirport(flightSys_t* s, char* name) {
    in flights.out to make sure your formatting is correct.
  */
 void printAirports(flightSys_t* s) {
-    // Replace this line with your code
+  if(s->size == 0) {
+    return ;
+  }
+  airport_t* temp = s->airport;
+
+  for(int i = 0; i < s->size; i++) {
+    printf("%s\n", temp->name);
+    temp = temp->next;
+  }
 }
 
 
@@ -78,7 +156,29 @@ void printAirports(flightSys_t* s) {
    Adds a flight to src's schedule, stating a flight will leave to dst at departure time and arrive at arrival time.
  */
 void addFlight(airport_t* src, airport_t* dst, timeHM_t* departure, timeHM_t* arrival, int cost) {
-    // Replace this line with your code
+  if(src->size == 0) {
+    src->flights = (flight_t*) malloc(1 * sizeof(flight_t));
+    src->flights->src = src;
+    src->flights->dst = dst;
+    src->flights->departure = *departure;
+    src->flights->arrival = *arrival;
+    src->flights->cost = cost;
+    src->size++;
+    return ;
+  }
+
+  flight_t* temp = src->flights;
+  for(int i = 0; i < src->size - 1; i++) {
+    temp = temp->next;
+  }
+  temp->next = (flight_t*) malloc(sizeof(flight_t));
+  temp->next->src = src;
+  temp->next->dst = dst;
+  temp->next->departure = *departure;
+  temp->next->arrival = *arrival;
+  temp->next->cost = cost;
+  src->size++;
+  return ;
 }
 
 
@@ -93,7 +193,17 @@ void addFlight(airport_t* src, airport_t* dst, timeHM_t* departure, timeHM_t* ar
    You should compare your output with the correct output in flights.out to make sure your formatting is correct.
  */
 void printSchedule(airport_t* s) {
-    // Replace this line with your code
+  printf("%s\n", s->name);
+  flight_t* temp = s->flights;
+  for(int i = 0; i < s->size; i++) {
+    printf("%s ", temp->dst->name);
+    printTime(&temp->departure);
+    printf(" ");
+    printTime(&temp->arrival);
+    printf(" %d\n", temp->cost);
+    temp = temp->next;
+  }
+  return ;
 }
 
 
@@ -108,6 +218,63 @@ void printSchedule(airport_t* s) {
    Please use the function isAfter() from time.h when comparing two timeHM_t objects.
  */
 bool getNextFlight(airport_t* src, airport_t* dst, timeHM_t* now, timeHM_t* departure, timeHM_t* arrival, int* cost) {
-    // Replace this line with your code
+  if(src->size == 0) {
     return false;
+  }
+
+  flight_t* temp = src->flights;
+  airport_t* toCompare = (airport_t*) malloc(sizeof(airport_t));
+  if(toCompare == NULL) {
+    allocation_failed();
+  }
+
+  int costcomp = INT_MAX;
+  for(int i = 0; i < src->size; i ++) {
+    if(temp->cost < costcomp && isAfter(&temp->departure, now)) {
+      costcomp = temp->cost;
+    }
+    temp = temp->next;
+  }
+
+  if(costcomp == INT_MAX) {
+    return false;
+  }
+
+  temp = src->flights;
+  for(int i = 0; i < src->size; i ++) {
+    if(temp->cost == costcomp) {
+      addFlight(toCompare, temp->dst, &temp->departure, &temp->arrival, temp->cost);
+    }
+    temp = temp->next;
+  }
+
+  temp = toCompare->flights;
+  flight_t* pointer = temp;
+  for(int i = 0; i < toCompare->size; i ++) {
+    if(isAfter(&pointer->departure, &temp->departure)) {
+      pointer = temp;
+    }
+    temp = temp->next;
+  }
+
+  *departure = pointer->departure;
+  *arrival = pointer->arrival;
+  *cost = pointer->cost;
+
+  //free(toCompare);
+  return true;
+}
+
+void freeAirport(airport_t* airport) {
+  if(airport) {
+    freeAirport(airport->next);
+    free(airport);
+  }
+}
+
+void freeFlights(flight_t* flights) {
+  if(flights) {
+    freeFlights(flights->next);
+    free(flights);
+  }
 }
