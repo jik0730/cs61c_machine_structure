@@ -250,6 +250,7 @@ bool getNextFlight(airport_t* src, airport_t* dst, timeHM_t* now, timeHM_t* depa
   }
 
   if(costcomp == INT_MAX) {
+    freeAirport(toCompare);
     return false;
   }
 
