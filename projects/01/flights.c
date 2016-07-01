@@ -243,7 +243,7 @@ bool getNextFlight(airport_t* src, airport_t* dst, timeHM_t* now, timeHM_t* depa
 
   int costcomp = INT_MAX;
   for(int i = 0; i < src->size; i++) {
-    if(temp->cost < costcomp && isAfter(&temp->departure, now)) {
+    if(temp->dst == dst && temp->cost < costcomp && isAfter(&temp->departure, now)) {
       costcomp = temp->cost;
     }
     temp = temp->next;
@@ -256,7 +256,7 @@ bool getNextFlight(airport_t* src, airport_t* dst, timeHM_t* now, timeHM_t* depa
 
   temp = src->flights;
   for(int i = 0; i < src->size; i++) {
-    if(temp->cost == costcomp) {
+    if(temp->dst == dst && temp->cost == costcomp && isAfter(&temp->departure, now)) {
       addFlight(toCompare, temp->dst, &temp->departure, &temp->arrival, temp->cost);
     }
     temp = temp->next;
@@ -265,7 +265,7 @@ bool getNextFlight(airport_t* src, airport_t* dst, timeHM_t* now, timeHM_t* depa
   temp = toCompare->flights;
   flight_t* pointer = temp;
   for(int i = 0; i < toCompare->size; i++) {
-    if(isAfter(&pointer->departure, &temp->departure)) {
+    if(isAfter(&pointer->arrival, &temp->arrival)) {
       pointer = temp;
     }
     temp = temp->next;
