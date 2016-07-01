@@ -209,7 +209,7 @@ void printSchedule(airport_t* s) {
     printTime(&temp->departure);
     printf(" ");
     printTime(&temp->arrival);
-    printf(" %d\n", temp->cost);
+    printf(" $%d\n", temp->cost);
     temp = temp->next;
   }
   return ;
