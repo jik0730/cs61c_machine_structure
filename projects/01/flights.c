@@ -95,7 +95,7 @@ void addAirport(flightSys_t* s, char* name) {
     allocation_failed();
   }
 
-  char* a_name = (char*) malloc(sizeof(name)); // Allocate memory to a_name with the same size of a memory we received.
+  char* a_name = (char*) malloc((strlen(name) + 1) * sizeof(char)); // Allocate memory to a_name with the same size of a memory we received.
   if(a_name == NULL) { // In case of fail of memory allocation.
     allocation_failed();
   }
