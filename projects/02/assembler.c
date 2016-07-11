@@ -152,10 +152,17 @@ int pass_one(FILE* input, FILE* output, SymbolTable* symtbl) {
 
         // Scan for the instruction name
     	char* token = strtok(buf, IGNORE_CHARS);
+        int first_token_is_label= add_if_label(input_line, token, byte_offset, symtbl);
+        if (first_token_is_label) {
+            if (first_token_is_label == -1) ret_code = -1;
+            //next word is instruction
+            token = strtok(NULL, IGNORE_CHARS);
+        }
 
         // Scan for arguments
         char* args[MAX_ARGS];
         int num_args = 0;
+        parse_args(input_line, args, &num_args);
 
     	// Checks to see if there were any errors when writing instructions
         unsigned int lines_written = write_pass_one(output, token, args, num_args);
@@ -165,7 +172,7 @@ int pass_one(FILE* input, FILE* output, SymbolTable* symtbl) {
         } 
         byte_offset += lines_written * 4;
     }       
-    return -1;
+    return ret_code;
 }
 
 /* Reads an intermediate file and translates it into machine code. You may assume:
@@ -196,12 +203,14 @@ int pass_two(FILE *input, FILE* output, SymbolTable* symtbl, SymbolTable* reltbl
         char* name = strtok(buf, IGNORE_CHARS);
 
         // Error checking?
+        if (name == NULL) ret_code = -1;
 
         /* Parse for instruction arguments. You should use strtok() to tokenize
            the rest of the line. Extra arguments should be filtered out in pass_one(),
            so you don't need to worry about that here. */
         char* args[MAX_ARGS];
         int num_args = 0;
+        parse_args(input_line, args, &num_args);
 
 
         /* Use translate_inst() to translate the instruction and write to output file.
@@ -209,10 +218,13 @@ int pass_two(FILE *input, FILE* output, SymbolTable* symtbl, SymbolTable* reltbl
            raise_inst_error(). */
 
         int num = 0;
+        num = translate_inst(output, name, args, num_args, byte_offset, symtbl, reltbl);
+        if (num) raise_inst_error(input_line, name, args, num_args);
+        byte_offset += 4;
     }
     /* Repeat until no more characters are left */
 
-    return -1;
+    return ret_code;
 }
 
 /*******************************
