@@ -85,6 +85,7 @@ int translate_num(long int* output, const char* str, long int lower_bound,
 
     *output = strtol(str, &endptr, base);
     if ((*output >= lower_bound) && (*output <= upper_bound) &&(!*endptr)) return 0;
+    return -1;
 }
 
 /* Translates the register name to the corresponding register number. Please
