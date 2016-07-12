@@ -214,7 +214,7 @@ int write_divmult(uint8_t funct, FILE* output, char** args, size_t num_args) {
 }
 
 int write_mf(uint8_t funct, FILE* output, char** args, size_t num_args) {
-    if (num_args != 2 || !output || !args || !(*args)) {
+    if (num_args != 1 || !output || !args || !(*args)) {
         return -1;
     }
 
