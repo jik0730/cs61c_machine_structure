@@ -65,6 +65,10 @@ void test_translate_reg() {
     CU_ASSERT_EQUAL(translate_reg("$3"), -1);
     CU_ASSERT_EQUAL(translate_reg("asdf"), -1);
     CU_ASSERT_EQUAL(translate_reg("hey there"), -1);
+    CU_ASSERT_EQUAL(translate_reg("?"), -1);
+    CU_ASSERT_EQUAL(translate_reg("$210392183091"), -1);
+    CU_ASSERT_EQUAL(translate_reg("2827342938"), -1);
+    CU_ASSERT_EQUAL(translate_reg("0"), -1);
 }
 
 void test_translate_num() {
@@ -83,6 +87,11 @@ void test_translate_num() {
     CU_ASSERT_EQUAL(output, 72);
     CU_ASSERT_EQUAL(translate_num(&output, "72", 73, 150), -1);
     CU_ASSERT_EQUAL(translate_num(&output, "35x", -100, 100), -1);
+    CU_ASSERT_EQUAL(translate_num(&output, "0", -100, 100), 0);
+    CU_ASSERT_EQUAL(translate_num(&output, "0", -1, 1), 0);
+    CU_ASSERT_EQUAL(translate_num(&output, "0", 0, 0), 0);
+    CU_ASSERT_EQUAL(translate_num(&output, "0xFF", -100, 255), 0);
+    CU_ASSERT_EQUAL(translate_num(&output, "0xFF", -100, 254), -1);
 }
 
 /****************************************
@@ -104,6 +113,18 @@ void test_table_1() {
     retval = add_to_table(tbl, "q45", 24); 
     CU_ASSERT_EQUAL(retval, -1); 
     retval = add_to_table(tbl, "bob", 14); 
+    CU_ASSERT_EQUAL(retval, -1); 
+    retval = add_to_table(tbl, "jiofwjelkd", 28); 
+    CU_ASSERT_EQUAL(retval, 0); 
+    retval = add_to_table(tbl, "asdfsd", 28); 
+    CU_ASSERT_EQUAL(retval, -1); 
+    retval = add_to_table(tbl, "jiofwjelkd", 32); 
+    CU_ASSERT_EQUAL(retval, -1); 
+    retval = add_to_table(tbl, "asd123", 29); 
+    CU_ASSERT_EQUAL(retval, -1); 
+    retval = add_to_table(tbl, "asd123", 30); 
+    CU_ASSERT_EQUAL(retval, -1); 
+    retval = add_to_table(tbl, "asd123", 31); 
     CU_ASSERT_EQUAL(retval, -1); 
 
     retval = get_addr_for_symbol(tbl, "abc");

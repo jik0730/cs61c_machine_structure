@@ -113,7 +113,6 @@ unsigned write_pass_one(FILE* output, const char* name, char** args, int num_arg
     }
     write_inst_string(output, name, args, num_args);
     return 1;
-
 }
 
 /* Writes the instruction in hexadecimal format to OUTPUT during pass #2.

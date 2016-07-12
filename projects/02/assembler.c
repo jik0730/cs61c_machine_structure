@@ -178,7 +178,7 @@ int pass_one(FILE* input, FILE* output, SymbolTable* symtbl) {
         if (lines_written == 0) {
             raise_inst_error(input_line, token, args, num_args);
             ret_code = -1;
-        } 
+        }
         byte_offset += lines_written * 4;
     }       
     return ret_code;
@@ -228,7 +228,10 @@ int pass_two(FILE *input, FILE* output, SymbolTable* symtbl, SymbolTable* reltbl
 
         int num = 0;
         num = translate_inst(output, name, args, num_args, byte_offset, symtbl, reltbl);
-        if (num) raise_inst_error(input_line, name, args, num_args);
+        if (num) {
+            raise_inst_error(input_line, name, args, num_args);
+            ret_code = -1;
+        }
         byte_offset += 4;
     }
     /* Repeat until no more characters are left */
