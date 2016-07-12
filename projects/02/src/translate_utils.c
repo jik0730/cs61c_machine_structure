@@ -62,21 +62,6 @@ int translate_num(long int* output, const char* str, long int lower_bound,
         return -1;
     }
     
-    // long int li;
-    // char* pEnd;
-    // li = strtol(str, &pEnd, 0);
-    // // overflow
-    // if (li < lower_bound || li > upper_bound) {
-    //   return -1;
-    // }
-    // // do we have to check whether the number is real '0'?
-    // if (li == (long int) 0) {
-    //   return -1;
-    // }
-
-    // *output = li;
-    //return 0;
-
     char *endptr;
     int base = 10;
     //check first two characters for hex. Set base accordingly if hex
