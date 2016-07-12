@@ -26,7 +26,7 @@ top:
     sw     $t2, 28($t0)         # A[i] = 0
     addi   $t0, $t0, 4          # update $t0 to point to next element
     j      top                  # go to top of loop
-done:
+done1:
 
 # NOTE: We have not updated i in memory!
     lw    $t0, 1060($at)      # fetch background
@@ -56,10 +56,10 @@ skip:
     addi   $t1, $zero, -1    # -1
     sw     $t1, 32($t2)      # A[i+1] = -1
     lw     $t0, 4($at)       # fetch N
-    mult   $t0, $t0, $t0     # N*N
+    mult   $t0, $t0
     lw     $t1, 4($at)       # fetch N
     ori    $t2, $zero, 3     # 3
-    mult   $t1, $t1, $t2     # 3*N
+    mult   $t1, $t1
     add    $t2, $t0, $t1     # N*N + 3*N
     sw     $t2, 0($at)       # i = ...
     rem    $t0, $s0, $s1
