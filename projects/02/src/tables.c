@@ -61,14 +61,11 @@ SymbolTable* create_table(int mode) {
 /* Frees the given SymbolTable and all associated memory. */
 void free_table(SymbolTable* table) {
     // Free names in symbols.
-    Symbol* temp = table->tbl;
-    for (int i = 0; i < table->len; i++) {
-        free(temp->name);
-        temp++;
+    for (int i = 0; i< (table->len); i++){
+        free(((table->tbl)+i)->name);
     }
-    // Free symbols.
-    free(table->tbl);
-    // Free symbol table.
+    // Free table->tbl and table.
+    if (table->tbl) free(table->tbl);
     free(table);
 }
 
@@ -116,33 +113,30 @@ int add_to_table(SymbolTable* table, const char* name, uint32_t addr) {
         name_already_exists(name);
         return -1;
     }
-    // Allocate memory for symbol.
-    Symbol* sym = (Symbol *) malloc(sizeof(Symbol));
-    if (!sym) {
-        allocation_failed();
-    }
-    // Make copy of name.
-    char* cpname = create_copy_of_str(name);
-    // Initialize a symbol.
-    sym->name = cpname;
-    sym->addr = addr;
-    // Resize a symbol table.
-    SymbolTable* temp = table;
-    table = (SymbolTable *) malloc(sizeof(temp) + sizeof(sym));
-    if (!table) {
-        allocation_failed();
-    }
-    // Copy elements which is originally located in previous memory block.
-    *(table->tbl) = *(temp->tbl);
-    *(table->tbl + temp->len) = *sym;
 
-    /****** What do 'len' and 'cap' exactly mean? ******/
-
-    table->len = temp->len + 1;
-    table->cap = temp->cap;
-    table->mode = temp->mode;
-    // Free temporary symbol.
-    free(sym);
+    if (!table->tbl) {
+        table->tbl = (Symbol *) malloc(sizeof(Symbol));
+        if (!table->tbl) {
+            allocation_failed();
+        }
+        // Make copy of name.
+        char* cpname = create_copy_of_str(name);
+        // Initialize a symbol.
+        table->tbl->name = cpname;
+        table->tbl->addr = addr;
+        table->len = 1;
+    } else {
+        table->tbl = (Symbol *) realloc(table->tbl, (table->len + 1) * sizeof(Symbol));
+        if (!table->tbl) {
+            allocation_failed();
+        }
+        // Make copy of name.
+        char* cpname = create_copy_of_str(name);
+        // Initialize a symbol.
+        table->tbl[table->len].name = cpname;
+        table->tbl[table->len].addr = addr;
+        table->len++;
+    }
     return 0;
 }
 

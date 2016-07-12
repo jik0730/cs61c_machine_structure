@@ -152,17 +152,26 @@ int pass_one(FILE* input, FILE* output, SymbolTable* symtbl) {
 
         // Scan for the instruction name
     	char* token = strtok(buf, IGNORE_CHARS);
+        if (!token) {
+            continue;
+        }
         int first_token_is_label= add_if_label(input_line, token, byte_offset, symtbl);
         if (first_token_is_label) {
             if (first_token_is_label == -1) ret_code = -1;
             //next word is instruction
             token = strtok(NULL, IGNORE_CHARS);
         }
-
+        // when token is NULL.
+        if (!token) {
+            continue;
+        }
         // Scan for arguments
         char* args[MAX_ARGS];
         int num_args = 0;
-        parse_args(input_line, args, &num_args);
+        if (parse_args(input_line, args, &num_args) == -1) {
+            ret_code = -1;
+            continue;
+        }
 
     	// Checks to see if there were any errors when writing instructions
         unsigned int lines_written = write_pass_one(output, token, args, num_args);

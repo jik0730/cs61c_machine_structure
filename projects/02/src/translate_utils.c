@@ -81,7 +81,8 @@ int translate_num(long int* output, const char* str, long int lower_bound,
     int base = 10;
     //check first two characters for hex. Set base accordingly if hex
     if ((str[0]=='0')&&(str[1]=='x')){
-        base = 16; }
+        base = 16;
+    }
 
     *output = strtol(str, &endptr, base);
     if ((*output >= lower_bound) && (*output <= upper_bound) &&(!*endptr)) return 0;

@@ -49,29 +49,29 @@ unsigned write_pass_one(FILE* output, const char* name, char** args, int num_arg
         }
         // Immediate range check.
         long int imm;
-        int err = translate_num(&imm, args[2], INT32_MIN, INT32_MAX);
+        int err = translate_num(&imm, args[1], INT32_MIN, UINT32_MAX);
         if (err == -1) {
             return 0;
         }
-        // If we can just use addu.
+        // If we can just use addiu.
         if (imm <= INT16_MAX && imm >= INT16_MIN) {
-            char hex[5];
-            sprintf(hex, "%x", (uint16_t) imm);
-            char *t_args[3] = {args[0], hex, "$0"};
-            write_inst_string(output, "addu", t_args, 3);
+            char hex[10];
+            sprintf(hex, "%d", (int16_t) imm);
+            char *t_args[3] = {args[0], "$0", hex};
+            write_inst_string(output, "addiu", t_args, 3);
             return 1;
         } else {
             // Divide into upper and lower
             uint16_t upper = imm >> 16;
             uint16_t lower = 0xffff & imm;
-            char hexu[5];
-            sprintf(hexu, "%x", upper);
-            char hexl[5];
-            sprintf(hexl, "%x", lower);
+            char hexu[10];
+            sprintf(hexu, "%d", upper);
+            char hexl[10];
+            sprintf(hexl, "%d", lower);
             char *tu_args[2] = {"$at", hexu};
-            char *tl_args[2] = {"$at", hexl};
+            char *tl_args[3] = {args[0], "$at", hexl};
             write_inst_string(output, "lui", tu_args, 2);
-            write_inst_string(output, "ori", tl_args, 2);
+            write_inst_string(output, "ori", tl_args, 3);
             return 2;
         }
     } else if (strcmp(name, "move") == 0) {
@@ -160,6 +160,7 @@ int translate_inst(FILE* output, const char* name, char** args, size_t num_args,
     else if (strcmp(name, "div") == 0)   return write_divmult (0x1a, output, args, num_args);
     else if (strcmp(name, "mfhi") == 0)  return write_mf (0x10, output, args, num_args);
     else if (strcmp(name, "mflo") == 0)  return write_mf (0x12, output, args, num_args);
+    else if (strcmp(name, "jr") == 0)    return write_jr (0x08, output, args, num_args);
 
     else                                 return -1;
 }
@@ -179,6 +180,9 @@ int write_rtype(uint8_t funct, FILE* output, char** args, size_t num_args) {
     int rd = translate_reg(args[0]);
     int rs = translate_reg(args[1]);
     int rt = translate_reg(args[2]);
+    if (rd == -1 || rt == -1 || rs == -1) {
+        return -1;
+    }
     // Shift rd, rs, rt.
     rd = rd << 11;
     rs = rs << 21;
@@ -197,6 +201,9 @@ int write_divmult(uint8_t funct, FILE* output, char** args, size_t num_args) {
 
     int rs = translate_reg(args[0]);
     int rt = translate_reg(args[1]);
+    if (rt == -1 || rs == -1) {
+        return -1;
+    }
     // Shift rs, rt.
     rs = rs << 21;
     rt = rt << 16;
@@ -213,6 +220,9 @@ int write_mf(uint8_t funct, FILE* output, char** args, size_t num_args) {
     }
 
     int rd = translate_reg(args[0]);
+    if (rd == -1) {
+        return -1;
+    }
     // Shift rs, rt.
     rd = rd << 11;
 
@@ -238,7 +248,7 @@ int write_shift(uint8_t funct, FILE* output, char** args, size_t num_args) {
     int rd = translate_reg(args[0]);
     int rt = translate_reg(args[1]);
     int err = translate_num(&shamt, args[2], 0, 31);
-    if (err == -1) {
+    if (err == -1 || rt == -1 || rd == -1) {
         return -1;
     }
     // Shift registers.
@@ -260,6 +270,9 @@ int write_jr(uint8_t funct, FILE* output, char** args, size_t num_args) {
     }
 
     int rs = translate_reg(args[0]);
+    if (rs == -1) {
+        return -1;
+    }
     // Shift.
     rs = rs << 21;
 
@@ -279,7 +292,7 @@ int write_addiu(uint8_t opcode, FILE* output, char** args, size_t num_args) {
     int rs = translate_reg(args[1]);
     int err = translate_num(&imm, args[2], INT16_MIN, INT16_MAX);
     uint32_t _opcode = opcode;
-    if (err == -1) {
+    if (err == -1 || rt == -1 || rs == -1) {
         return -1;
     }
     rt = rt << 16;
@@ -287,13 +300,14 @@ int write_addiu(uint8_t opcode, FILE* output, char** args, size_t num_args) {
     _opcode = _opcode << 26;
 
     uint32_t instruction = 0;
-    instruction = instruction | rs | rt | (int16_t) imm | _opcode;
+    instruction = instruction | rs | rt | (uint16_t) imm | _opcode;
     write_inst_hex(output, instruction);
     return 0;
 }
 
 int write_ori(uint8_t opcode, FILE* output, char** args, size_t num_args) {
     if (num_args != 3 || !output || !args || !(*args)) {
+        printf("Wrong input for write_ori()\n");
         return -1;
     }
     
@@ -302,7 +316,7 @@ int write_ori(uint8_t opcode, FILE* output, char** args, size_t num_args) {
     int rs = translate_reg(args[1]);
     int err = translate_num(&imm, args[2], 0, UINT16_MAX);
     uint32_t _opcode = opcode;
-    if (err == -1) {
+    if (err == -1 || rt == -1 || rs == -1) {
         return -1;
     }
     rt = rt << 16;
@@ -317,6 +331,7 @@ int write_ori(uint8_t opcode, FILE* output, char** args, size_t num_args) {
 
 int write_lui(uint8_t opcode, FILE* output, char** args, size_t num_args) {
     if (num_args != 2 || !output || !args || !(*args)) {
+        printf("Wrong input for write_lui()\n");
         return -1;
     }
     
@@ -324,7 +339,7 @@ int write_lui(uint8_t opcode, FILE* output, char** args, size_t num_args) {
     int rt = translate_reg(args[0]);
     int err = translate_num(&imm, args[1], 0, UINT16_MAX);
     uint32_t _opcode = opcode;
-    if (err == -1) {
+    if (err == -1 || rt == -1) {
         return -1;
     }
     rt = rt << 16;
@@ -338,6 +353,7 @@ int write_lui(uint8_t opcode, FILE* output, char** args, size_t num_args) {
 
 int write_mem(uint8_t opcode, FILE* output, char** args, size_t num_args) {
     if (num_args != 3 || !output || !args || !(*args)) {
+        printf("Wrong input for write_mem()\n");
         return -1;
     }
     
@@ -346,7 +362,7 @@ int write_mem(uint8_t opcode, FILE* output, char** args, size_t num_args) {
     int rs = translate_reg(args[2]);
     int err = translate_num(&imm, args[1], INT16_MIN, INT16_MAX);
     uint32_t _opcode = opcode;
-    if (err == -1) {
+    if (err == -1 || rt == -1 || rs == -1) {
         return -1;
     }
     rt = rt << 16;
@@ -354,7 +370,7 @@ int write_mem(uint8_t opcode, FILE* output, char** args, size_t num_args) {
     _opcode = _opcode << 26;
 
     uint32_t instruction = 0;
-    instruction = instruction | rs | rt | (int16_t) imm | _opcode;
+    instruction = instruction | rs | rt | (uint16_t) imm | _opcode;
     write_inst_hex(output, instruction);
     return 0;
 }
@@ -376,7 +392,7 @@ int write_branch(uint8_t opcode, FILE* output, char** args, size_t num_args, uin
     int rs = translate_reg(args[0]);
     int rt = translate_reg(args[1]);
     int label_addr = get_addr_for_symbol(symtbl, args[2]);
-    if (!can_branch_to((uint32_t) label_addr, addr)) {
+    if (!can_branch_to((uint32_t) label_addr, addr) || label_addr == -1 || rt == -1 || rs == -1) {
         return -1;
     }
     uint32_t _opcode = opcode;
@@ -385,7 +401,7 @@ int write_branch(uint8_t opcode, FILE* output, char** args, size_t num_args, uin
     _opcode = _opcode << 26;
 
     //Please compute the branch offset using the MIPS rules.
-    int32_t offset = (addr - (uint32_t) label_addr - 4) / 4;
+    uint16_t offset = (label_addr - addr - 4) / 4;
     uint32_t instruction = 0;
     instruction = instruction | rs | rt | offset | _opcode;
     write_inst_hex(output, instruction);        
@@ -394,7 +410,7 @@ int write_branch(uint8_t opcode, FILE* output, char** args, size_t num_args, uin
 
 
 int write_jump(uint8_t opcode, FILE* output, char** args, size_t num_args, uint32_t addr, SymbolTable* reltbl) {
-    if (num_args != 3 || !output || !args || !(*args)) {
+    if (num_args != 1 || !output || !args || !(*args)) {
         return -1;
     }
     
