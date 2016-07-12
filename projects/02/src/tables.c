@@ -103,8 +103,7 @@ int add_to_table(SymbolTable* table, const char* name, uint32_t addr) {
     // Name test.
     int btest = 0;
     for (int i = 0; i < table->len; i++) {
-        char* c = table->tbl->name;
-        if (strcmp(c, name) == 0) {
+        if (strcmp(((table->tbl)+i)->name, name) == 0) {
             btest = 1;
             break;
         }
