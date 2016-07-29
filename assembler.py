@@ -45,20 +45,20 @@ mf_re    = re.compile(r'''^(?P<instr>(mfhi|mflo))\s+(?P<rd>\$(0|zero|at|v[0,1]|a
 #sll srl sra
 shift_re  = re.compile(r'''^(?P<instr>(sll|srl|sra))\s+(?P<rd>\$(0|zero|at|v[0,1]|a[0-3]|t[0-9]|s[0-7]|k[0-1]|gp|fp|sp|ra))\s+(?P<rt>\$(0|zero|at|v[0,1]|a[0-3]|t[0-9]|s[0-7]|k[0-1]|gp|fp|sp|ra))\s+(?P<immed>-?(0x)?[0-9a-fA-F]+)$''')
 #ori addi addiu andi
-immed_re  = re.compile(r'''^(?P<instr>(ori|addi|addiu|andi|slti|sltiu))\s+(?P<rt>\$(0|zero|at|v[0,1]|a[0-3]|t[0-9]|s[0-7]|k[0-1]|gp|fp|sp|ra))\s+(?P<rs>\$(0|zero|at|v[0,1]|a[0-3]|t[0-9]|s[0-7]|k[0-1]|gp|sp|fp|ra))\s+(?P<immed>-?(0x)?[0-9a-fA-F]+)$''')
+immed_re  = re.compile(r'''^(?P<instr>(ori|addi|addiu|andi|slti))\s+(?P<rt>\$(0|zero|at|v[0,1]|a[0-3]|t[0-9]|s[0-7]|k[0-1]|gp|fp|sp|ra))\s+(?P<rs>\$(0|zero|at|v[0,1]|a[0-3]|t[0-9]|s[0-7]|k[0-1]|gp|sp|fp|ra))\s+(?P<immed>-?(0x)?[0-9a-fA-F]+)$''')
 #lui
 lui_re    = re.compile(r'''^(?P<instr>lui)\s+(?P<rt>\$(0|zero|at|v[0,1]|a[0-3]|t[0-9]|s[0-7]|k[0-1]|gp|fp|sp|ra))\s+(?P<immed>-?(0x)?[0-9a-fA-F]+)$''')
 #sw lw sb lb lbu sh lhu swinc
 mem_re    = re.compile(r'''^(?P<instr>(lw|sw|lb|lbu|sb|sh|lhu|swinc))\s+(?P<rt>\$(0|zero|at|v[0,1]|a[0-3]|t[0-9]|s[0-7]|k[0-1]|gp|fp|sp|ra))\s+(?P<immed>-?(0x)?[0-9a-fA-F]+)\s*\(\s*(?P<rs>\$(0|zero|at|v[0,1]|a[0-3]|t[0-9]|s[0-7]|k[0-1]|gp|fp|sp|ra))\s*\)$''')
 #j jal
 j_re      = re.compile(r'''^(?P<instr>(j|jal))\s+(?P<label>\w+)$''')
-#beq bne
-branch_re = re.compile(r'''^(?P<instr>(beq|beqal|bne))\s+(?P<rs>\$(0|zero|at|v[0,1]|a[0-3]|t[0-9]|s[0-7]|k[0-1]|gp|sp|fp|ra))\s+(?P<rt>\$(0|zero|at|v[0,1]|a[0-3]|t[0-9]|s[0-7]|k[0-1]|gp|sp|fp|ra))\s+(?P<label>\w+)$''') #note switch
-#jr
-jr_re     = re.compile(r'''^(?P<instr>(jr))\s+(?P<rs>\$(0|zero|at|v[0,1]|a[0-3]|t[0-9]|s[0-7]|k[0-1]|gp|fp|sp|ra))$''')
+#beq bne bov
+branch_re = re.compile(r'''^(?P<instr>(beq|beqal|bne|bov))\s+(?P<rs>\$(0|zero|at|v[0,1]|a[0-3]|t[0-9]|s[0-7]|k[0-1]|gp|sp|fp|ra))\s+(?P<rt>\$(0|zero|at|v[0,1]|a[0-3]|t[0-9]|s[0-7]|k[0-1]|gp|sp|fp|ra))\s+(?P<label>\w+)$''') #note switch
+#jr jalr
+jr_re     = re.compile(r'''^(?P<instr>(jr|jalr))\s+(?P<rs>\$(0|zero|at|v[0,1]|a[0-3]|t[0-9]|s[0-7]|k[0-1]|gp|fp|sp|ra))$''')
 #la
 la_re     = re.compile(r'''^(?P<instr>(la))\s+(?P<rt>\$(0|zero|at|v[0,1]|a[0-3]|t[0-9]|s[0-7]|k[0-1]|gp|fp|sp|ra))\s+(?P<label>\w+)$''')
-signed_re = re.compile(r'addi|addiu|beq|beqal|bne|lw|sw|sb|lb|lbu|sh|lhu|swinc|slti|sltiu')
+signed_re = re.compile(r'addi|addiu|beq|beqal|bne|lw|sw|sb|lb|lbu|sh|lhu|swinc|slti')
 both_allowed_re = re.compile(r'ori|andi')
 
 opcodes = {
@@ -67,10 +67,10 @@ opcodes = {
   'beq':0x4,
   'beqal':0x14,
   'bne':0x5,
+  'bov':0x6,
   'addi':0x8,
   'addiu':0x9,
   'slti': 0xa,
-  'sltiu': 0xb,
   'andi':0xc,
   'ori':0xd,
   'sw':0x2b,
@@ -93,6 +93,7 @@ functs = {
   'srl':2,
   'sra':3,
   'jr':8,
+  'jalr':9,
   'slt':0x2a,
   'sltu':0x2b,
   'or':0x25,
@@ -150,33 +151,33 @@ def fill_symbol_table(inputFile):
   for line in inputFile:
     #strip any comments
     match = commentre.match(line)
-    
+
     if not match:
       raise AssemblerSyntaxError(lineNo,"Unable to parse line: %s" % line)
-    
+
     line = match.group('important')
-    
+
     line = line.strip()
-    
+
     match = labelre.match(line)
-    
+
     if not match:
       raise AssemblerSyntaxError(lineNo,"Unable to parse line: %s" % line)
-    
+
     labels_string = match.group('labels')
-    
+
     if labels_string:
       labels = labels_string[:-1].split(':')
     else:
       labels = []
-    
+
     for label in labels:
       if not validLabel(label):
         raise AssemblerSyntaxError(lineNo,"Invalid label: '%s'"%label)
       if label in symbols:
         raise AssemblerSyntaxError(lineNo,"Label %s already defined" % label)
       symbols[label] = instructionsSeen
-    
+
     instruction = match.group('gunk').replace(',',' ').strip()
     if len(instruction) != 0:
       #there's an instruction here, so increment the number of instructions
@@ -209,11 +210,11 @@ def assemble_instructions(inputFile):
     match = commentre.match(line)
     assert(match)
     line = match.group('important')
-    
+
     line = line.strip()
-    
+
     match = labelre.match(line)
-    
+
     instruction = match.group('gunk').replace(',',' ').strip()
 
     rtype    = rtype_re.match(instruction)
@@ -228,7 +229,7 @@ def assemble_instructions(inputFile):
     jr       = jr_re.match(instruction)
     signed   = signed_re.match(instruction)
     both_allowed = both_allowed_re.match(instruction)
-     
+
     if len(instruction) != 0:
       num = 0
       if rtype:
@@ -344,14 +345,14 @@ if __name__ == "__main__":
   if len(args) != 1:
     parser.error("Incorrect command line arguments")
     sys.exit(1)
-  
+
   verbose = options.verbose
-  
+
   output_file = options.output_file
   input_file = args[0]
   if re.match(r""".*(?P<extension>\.s)$""",input_file,re.I) and output_file == 'a.hex':
     output_file = input_file[:-1] + "hex"
-  
+
   try:
     infile = open(input_file)
   except IOError,e:
