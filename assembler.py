@@ -192,7 +192,7 @@ def imm_check(signed,both_allowed,immediate,lineNo):
     if (immediate > 2 ** 16 - 1 or immediate < -(2 ** 16)):
         raise AssemblerSyntaxError(lineNo,"immediate out of range")
   else:
-    if signed and (immediate > 2 ** 16 - 1 or immediate < -(2 ** 16)):
+    if signed and (immediate > 2 ** 15 - 1 or immediate < -(2 ** 15)):
         raise AssemblerSyntaxError(lineNo,"signed immediate out of range")
     if (not signed) and (immediate > 2 ** 16 - 1 or immediate < 0):
         raise AssemblerSyntaxError(lineNo,"unsigned immediate out of range")
