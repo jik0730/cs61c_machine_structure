@@ -10,6 +10,8 @@ debug: clean all_debug
 all: $(BINARIES)
 
 all_debug: CC += -DDEBUG -ggdb3
+all_debug: CFLAGS += -g
+all_debug: LFLAGS += -g
 all_debug: all
 
 benchmark: benchmark.o calcDepthNaive.o calcDepthOptimized.o utils.o
