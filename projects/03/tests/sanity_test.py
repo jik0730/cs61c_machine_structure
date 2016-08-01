@@ -63,10 +63,10 @@ def run_tests(tests):
     else:
       print "\tFAILED test: %s (%s)" % (description, reason)
       tests_failed += 1
-  
+
   print "Passed %d/%d tests" % (tests_passed, (tests_passed + tests_failed))
 
-tests = [
+p1_tests = [
   ("ALU add (with overflow) test",
         TestCase(os.path.join(file_locations,'alu-add.circ'),
                  os.path.join(file_locations,'reference_output/alu-add.out'))),
@@ -81,5 +81,20 @@ tests = [
                  os.path.join(file_locations,'reference_output/regfile-zero.out'))),
 ]
 
+p2_tests = [
+  ("CPU starter test",
+        TestCase(os.path.join(file_locations,'CPU-starter_kit_test.circ'),
+                 os.path.join(file_locations,'reference_output/CPU-starter_kit_test.out'))),
+]
+
 if __name__ == '__main__':
-  run_tests(tests)
+  if len(sys.argv) < 2:
+    print("Usage: " + sys.argv[0] + " (p1|p2)")
+    sys.exit(-1)
+  if sys.argv[1] == 'p1':
+    run_tests(p1_tests)
+  elif sys.argv[1] == 'p2':
+    run_tests(p2_tests)
+  else:
+    print("Usage: " + sys.argv[0] + " (p1|p2)")
+    sys.exit(-1)
