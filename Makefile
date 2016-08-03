@@ -10,7 +10,7 @@ debug: clean all_debug
 all: $(BINARIES)
 
 all_debug: CC += -DDEBUG -ggdb3
-all_debug: CFLAGS += -g
+all_debug: CFLAGS = -DNDEBUG -g0 -std=c99 -Wall -march=corei7 -maes -mpclmul -mpopcnt -fopenmp -pthread -g
 all_debug: LFLAGS += -g
 all_debug: all
 
