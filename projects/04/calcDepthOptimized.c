@@ -31,7 +31,6 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
     #pragma omp parallel for
     for (int y = 0; y < imageHeight; y++)
     {
-        #pragma omp parallel for
         for (int x = 0; x < imageWidth; x++)
         {   
             /* Set the depth to 0 if looking at edge of the image where a feature box cannot fit. */
@@ -47,7 +46,7 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
 
             /* Iterate through all feature boxes that fit inside the maximum displacement box. 
                centered around the current pixel. */
-            //#pragma omp parallel for
+            #pragma omp parallel reduction(+:minimumSquaredDifference, minimumDx, minimumDy)
             for (int dy = -maximumDisplacement; dy <= maximumDisplacement; dy++)
             {
                 for (int dx = -maximumDisplacement; dx <= maximumDisplacement; dx++)
