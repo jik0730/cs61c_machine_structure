@@ -59,7 +59,7 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
                     float squaredDifference = 0;
 
                     /* Sum the squared difference within a box of +/- featureHeight and +/- featureWidth. */
-                    #pragma omp parallel reduction(+:squaredDifference)
+                    #pragma omp reduction(+:squaredDifference)
                     for (int boxY = -featureHeight; boxY <= featureHeight; boxY++)
                     {
                         for (int boxX = -featureWidth; boxX <= featureWidth; boxX++)
