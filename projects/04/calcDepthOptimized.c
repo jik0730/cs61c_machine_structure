@@ -45,6 +45,7 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
 
             /* Iterate through all feature boxes that fit inside the maximum displacement box. 
                centered around the current pixel. */
+            #pragma omp parallel for collapse(4)
             for (int dy = -maximumDisplacement; dy <= maximumDisplacement; dy++)
             {
                 for (int dx = -maximumDisplacement; dx <= maximumDisplacement; dx++)
@@ -58,24 +59,21 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
                     float squaredDifference = 0;
 
                     /* Sum the squared difference within a box of +/- featureHeight and +/- featureWidth. */
-                    int boxX, boxY;
-                    #pragma omp parallel
+                    // #pragma omp parallel for private(boxX) reduction(+:squaredDifference)
+                    for (int boxY = -featureHeight; boxY <= featureHeight; boxY++)
                     {
-                        #pragma omp parallel for private(boxX) reduction(+:squaredDifference)
-                        for (boxY = -featureHeight; boxY <= featureHeight; boxY++)
+                        for (int boxX = -featureWidth; boxX <= featureWidth; boxX++)
                         {
-                            for (boxX = -featureWidth; boxX <= featureWidth; boxX++)
-                            {
-                                int leftX = x + boxX;
-                                int leftY = y + boxY;
-                                int rightX = x + dx + boxX;
-                                int rightY = y + dy + boxY;
+                            int leftX = x + boxX;
+                            int leftY = y + boxY;
+                            int rightX = x + dx + boxX;
+                            int rightY = y + dy + boxY;
 
-                                float difference = left[leftY * imageWidth + leftX] - right[rightY * imageWidth + rightX];
-                                squaredDifference += difference * difference;
-                            }
+                            float difference = left[leftY * imageWidth + leftX] - right[rightY * imageWidth + rightX];
+                            squaredDifference += difference * difference;
                         }
                     }
+
 
                     /* 
                     Check if you need to update minimum square difference. 
