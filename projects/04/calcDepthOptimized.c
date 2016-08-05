@@ -18,7 +18,7 @@
 
 /* DO NOT CHANGE ANYTHING ABOVE THIS LINE. */
 // Implements the displacement function
-float displacementNaive(int dx, int dy)
+float displacementNaive2(int dx, int dy)
 {
     float squaredDisplacement = dx * dx + dy * dy;
     float displacement = sqrt(squaredDisplacement);
@@ -100,7 +100,7 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
                 }
                 else
                 {
-                    depth[y * imageWidth + x] = displacementNaive(minimumDx, minimumDy);
+                    depth[y * imageWidth + x] = displacementNaive2(minimumDx, minimumDy);
                 }
             }
             else
