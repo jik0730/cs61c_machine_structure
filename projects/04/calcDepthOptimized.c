@@ -28,10 +28,11 @@ float displacementNaive2(int dx, int dy)
 void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth, int imageHeight, int featureWidth, int featureHeight, int maximumDisplacement)
 {
     /* The two outer for loops iterate through each pixel */
-    #pragma omp parallel for
+    int x;
+    #pragma omp parallel for private(x)
     for (int y = 0; y < imageHeight; y++)
     {
-        for (int x = 0; x < imageWidth; x++)
+        for (x = 0; x < imageWidth; x++)
         {   
             /* Set the depth to 0 if looking at edge of the image where a feature box cannot fit. */
             if ((y < featureHeight) || (y >= imageHeight - featureHeight) || (x < featureWidth) || (x >= imageWidth - featureWidth))
