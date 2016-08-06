@@ -24,6 +24,10 @@ float displacementNaive2(int dx, int dy)
     return sqrt(dx * dx + dy * dy);
 }
 
+float compareDisplacement(int dx, int dy) {
+    return dx * dx + dy * dy;
+}
+
 void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth, int imageHeight, int featureWidth, int featureHeight, int maximumDisplacement)
 {
     /* The two outer for loops iterate through each pixel */
@@ -132,7 +136,7 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
                     displacement is less, or the current squared difference
                     is less than the min square difference.
                     */
-                    if ((minimumSquaredDifference == -1) || ((minimumSquaredDifference == squaredDifference) && (displacementNaive(dx, dy) < displacementNaive(minimumDx, minimumDy))) || (minimumSquaredDifference > squaredDifference))
+                    if ((minimumSquaredDifference == -1) || ((minimumSquaredDifference == squaredDifference) && (compareDisplacement(dx, dy) < compareDisplacement(minimumDx, minimumDy))) || (minimumSquaredDifference > squaredDifference))
                     {
                         minimumSquaredDifference = squaredDifference;
                         minimumDx = dx;
