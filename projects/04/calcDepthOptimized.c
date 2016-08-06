@@ -28,7 +28,7 @@ float displacementNaive2(int dx, int dy)
 void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth, int imageHeight, int featureWidth, int featureHeight, int maximumDisplacement)
 {
     /* The two outer for loops iterate through each pixel */
-    #pragma omp parallel for
+    #pragma omp parallel for private(depth)
     for (int y = 0; y < imageHeight; y++)
     {
         for (int x = 0; x < imageWidth; x++)
@@ -59,7 +59,7 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
                     float squaredDifference = 0;
 
                     /* Sum the squared difference within a box of +/- featureHeight and +/- featureWidth. */
-                    #pragma omp reduction(+:squaredDifference)
+                    // #pragma omp reduction(+:squaredDifference)
                     for (int boxY = -featureHeight; boxY <= featureHeight; boxY++)
                     {
                         for (int boxX = -featureWidth; boxX <= featureWidth; boxX++)
