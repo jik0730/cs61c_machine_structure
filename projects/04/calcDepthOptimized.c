@@ -89,7 +89,7 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
                     }
 
                     float squaredDifference = 0;
-                    __m128i squaredDifference_vector = _mm_setzero_si128();
+                    __m128 squaredDifference_vector = _mm_setzero_ps();
 
                     /* Sum the squared difference within a box of +/- featureHeight and +/- featureWidth. */
                     // #pragma omp reduction(+:squaredDifference)
@@ -101,12 +101,12 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
                         {
                             //int leftX = x + boxX;
                             //int rightX = x + dx + boxX;
-                            __m128i left_vector = _mm_loadu_si128((__m128i *) (left + leftY * imageWidth + x + boxX - featureWidth));
-                            __m128i right_vector = _mm_loadu_si128((__m128i *) (right + rightY * imageWidth + x + dx + boxX - featureWidth));
-                            __m128i difference_vector = _mm_sub_epi32(left_vector, right_vector);
+                            __m128 left_vector = _mm_load_ps((__m128i *) (left + leftY * imageWidth + x + boxX - featureWidth));
+                            __m128 right_vector = _mm_load_ps((__m128i *) (right + rightY * imageWidth + x + dx + boxX - featureWidth));
+                            __m128 difference_vector = _mm_sub_ps(left_vector, right_vector);
                             //float difference = left[leftY * imageWidth + leftX] - right[rightY * imageWidth + rightX];
-                            squaredDifference_vector = _mm_add_epi32(squaredDifference_vector, 
-                                (__m128i) _mm_mul_ps((__m128) difference_vector, (__m128) difference_vector));
+                            squaredDifference_vector = _mm_add_ps(squaredDifference_vector, 
+                                _mm_mul_ps(difference_vector, difference_vector));
                             //squaredDifference += difference * difference;
                         }
 
@@ -121,9 +121,9 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
                     }
 
                     float vec_sum[4];
-                    _mm_storeu_si128((__m128i *)vec_sum, squaredDifference_vector);
+                    _mm_store_ps(vec_sum, squaredDifference_vector);
                     squaredDifference += vec_sum[0] + vec_sum[1] + vec_sum[2] + vec_sum[3];
-                    printf("sD: %f", squaredDifference);
+                    //printf("sD: %f", squaredDifference);
 
                     /* 
                     Check if you need to update minimum square difference. 
