@@ -123,7 +123,7 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
                     float vec_sum[4];
                     _mm_storeu_si128((__m128i *)vec_sum, squaredDifference_vector);
                     squaredDifference += vec_sum[0] + vec_sum[1] + vec_sum[2] + vec_sum[3];
-
+                    printf("sD: %f", squaredDifference);
 
                     /* 
                     Check if you need to update minimum square difference. 
