@@ -101,8 +101,8 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
                         {
                             //int leftX = x + boxX;
                             //int rightX = x + dx + boxX;
-                            __m128 left_vector = _mm_load_ps((left + leftY * imageWidth + x + boxX - featureWidth));
-                            __m128 right_vector = _mm_load_ps((right + rightY * imageWidth + x + dx + boxX - featureWidth));
+                            __m128 left_vector = _mm_load_ps(left[leftY * imageWidth + x + boxX - featureWidth]);
+                            __m128 right_vector = _mm_load_ps(right[rightY * imageWidth + x + dx + boxX - featureWidth]);
                             __m128 difference_vector = _mm_sub_ps(left_vector, right_vector);
                             //float difference = left[leftY * imageWidth + leftX] - right[rightY * imageWidth + rightX];
                             squaredDifference_vector = _mm_add_ps(squaredDifference_vector, 
@@ -111,13 +111,13 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
                         }
 
                         // tail case
-                        // for (int i = (featureWidth + featureWidth) / 4 * 4; i <= featureWidth + featureWidth; i++)
-                        // {
-                        //     int leftX = x + i - featureWidth;
-                        //     int rightX = x + dx + i - featureWidth;
-                        //     float difference = left[leftY * imageWidth + leftX] - right[rightY * imageWidth + rightX];
-                        //     squaredDifference += difference * difference;
-                        // }
+                        for (int i = (featureWidth + featureWidth) / 4 * 4; i <= featureWidth + featureWidth; i++)
+                        {
+                            int leftX = x + i - featureWidth;
+                            int rightX = x + dx + i - featureWidth;
+                            float difference = left[leftY * imageWidth + leftX] - right[rightY * imageWidth + rightX];
+                            squaredDifference += difference * difference;
+                        }
                     }
 
                     float vec_sum[4];
