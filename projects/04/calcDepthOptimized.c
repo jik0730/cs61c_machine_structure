@@ -101,8 +101,8 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
                         {
                             //int leftX = x + boxX;
                             //int rightX = x + dx + boxX;
-                            __m128 left_vector = _mm_load_ps(left + leftY * imageWidth + x + boxX - featureWidth);
-                            __m128 right_vector = _mm_load_ps(right + rightY * imageWidth + x + dx + boxX - featureWidth);
+                            __m128 left_vector = _mm_loadu_ps(left + leftY * imageWidth + x + boxX - featureWidth);
+                            __m128 right_vector = _mm_loadu_ps(right + rightY * imageWidth + x + dx + boxX - featureWidth);
                             __m128 difference_vector = _mm_sub_ps(left_vector, right_vector);
                             //float difference = left[leftY * imageWidth + leftX] - right[rightY * imageWidth + rightX];
                             squaredDifference_vector = _mm_add_ps(squaredDifference_vector, 
@@ -121,7 +121,7 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
                     }
 
                     float vec_sum[4];
-                    _mm_store_ps(vec_sum, squaredDifference_vector);
+                    _mm_storeu_ps(vec_sum, squaredDifference_vector);
                     squaredDifference += vec_sum[0] + vec_sum[1] + vec_sum[2] + vec_sum[3];
                     //printf("sD: %f", squaredDifference);
 
