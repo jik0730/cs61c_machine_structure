@@ -60,7 +60,7 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
 
 
 
-    #pragma omp parallel for
+    //#pragma omp parallel for
     for (int y = 0; y < imageHeight; y++)
     {
         for (int x = 0; x < imageWidth; x++)
@@ -101,8 +101,8 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
                         {
                             //int leftX = x + boxX;
                             //int rightX = x + dx + boxX;
-                            __m128i left_vector = _mm_loadu_si128((__m128i *) (left + (y + boxY) * imageWidth + x + boxX - featureWidth));
-                            __m128i right_vector = _mm_loadu_si128((__m128i *) (right + (y + dy + boxY) * imageWidth + x + dx + boxX - featureWidth));
+                            __m128i left_vector = _mm_loadu_si128((__m128i *) (left + leftY * imageWidth + x + boxX - featureWidth));
+                            __m128i right_vector = _mm_loadu_si128((__m128i *) (right + rightY * imageWidth + x + dx + boxX - featureWidth));
                             __m128i difference_vector = _mm_sub_epi32(left_vector, right_vector);
                             //float difference = left[leftY * imageWidth + leftX] - right[rightY * imageWidth + rightX];
                             squaredDifference_vector = _mm_add_epi32(squaredDifference_vector, 
