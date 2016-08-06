@@ -31,19 +31,19 @@ float compareDisplacement(int dx, int dy) {
 void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth, int imageHeight, int featureWidth, int featureHeight, int maximumDisplacement)
 {
     /* The two outer for loops iterate through each pixel */
-    // // #pragma omp parallel for shared(depth)
-    // for (int y = 0; y < featureHeight; y++) {
-    //     for (int x = 0; x < imageWidth; x++) {
-    //         depth[y * imageWidth + x] = 0;
-    //     }
-    // }
+    // #pragma omp parallel for shared(depth)
+    for (int y = 0; y < featureHeight; y++) {
+        for (int x = 0; x < imageWidth; x++) {
+            depth[y * imageWidth + x] = 0;
+        }
+    }
 
-    // // #pragma omp parallel for shared(depth)
-    // for (int y = imageHeight - featureHeight; y < imageHeight; y++) {
-    //     for (int x = 0; x < imageWidth; x++) {
-    //         depth[y * imageWidth + x] = 0;
-    //     }
-    // }
+    // #pragma omp parallel for shared(depth)
+    for (int y = imageHeight - featureHeight; y < imageHeight; y++) {
+        for (int x = 0; x < imageWidth; x++) {
+            depth[y * imageWidth + x] = 0;
+        }
+    }
     // for (int y = 0; y < imageHeight; y += 4) {
     //     for (int x = 0; x < imageWidth; x += 4) {
 
@@ -149,9 +149,16 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
             Set the value in the depth map. 
             If max displacement is equal to 0, the depth value is just 0.
             */
-            if (minimumSquaredDifference != -1 && maximumDisplacement != 0)
+            if (minimumSquaredDifference != -1)
             {
-                depth[y * imageWidth + x] = displacementNaive2(minimumDx, minimumDy);
+                if (maximumDisplacement == 0)
+                {
+                    depth[y * imageWidth + x] = 0;
+                }
+                else
+                {
+                    depth[y * imageWidth + x] = displacementNaive2(minimumDx, minimumDy);
+                }
             }
             else
             {
