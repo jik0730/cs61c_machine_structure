@@ -45,10 +45,16 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
     #pragma omp parallel for
     for (int y = 0; y < imageHeight; y++)
     {
+        if (y < featureHeight || y >= imageHeight - featureHeight) {
+            for (int x = 0; x < imageWidth; x++) {
+                depth[y * imageWidth + x] = 0;
+                continue;
+            }
+        }
         for (int x = 0; x < imageWidth; x++)
         {   
             /* Set the depth to 0 if looking at edge of the image where a feature box cannot fit. */
-            if ((y < featureHeight) || (y >= imageHeight - featureHeight) || (x < featureWidth) || (x >= imageWidth - featureWidth))
+            if ((x < featureWidth) || (x >= imageWidth - featureWidth))
             {
                 depth[y * imageWidth + x] = 0;
                 continue;
