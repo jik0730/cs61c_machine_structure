@@ -95,7 +95,7 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
                     // #pragma omp reduction(+:squaredDifference)
                     for (int boxY = -featureHeight; boxY <= featureHeight; boxY++)
                     {
-                        //int leftY = y + boxY;
+                        int leftY = y + boxY;
                         int rightY = y + dy + boxY;
                         for (int boxX = 0; boxX < (featureWidth + featureWidth) / 4 * 4; boxX += 4)
                         {
