@@ -97,13 +97,13 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
                     {
                         int leftY = y + boxY;
                         int rightY = y + dy + boxY;
-                        for (int boxX = 0; boxX < (featureWidth + featureWidth) / 4 * 4; boxX += 4)
+                        for (int boxX = 0; boxX <= (featureWidth + featureWidth) / 4 * 4; boxX += 4)
                         {
                             //int leftX = x + boxX;
                             //int rightX = x + dx + boxX;
-                            //__m128 left_vector = _mm_loadu_ps(left + leftY * imageWidth + x + boxX - featureWidth);
-                            //__m128 right_vector = _mm_loadu_ps(right + rightY * imageWidth + x + dx + boxX - featureWidth);
-                            __m128 difference_vector = _mm_sub_ps(_mm_loadu_ps(left + leftY * imageWidth + x + boxX - featureWidth), _mm_loadu_ps(right + rightY * imageWidth + x + dx + boxX - featureWidth));
+                            __m128 left_vector = _mm_loadu_ps(left + leftY * imageWidth + x + boxX - featureWidth);
+                            __m128 right_vector = _mm_loadu_ps(right + rightY * imageWidth + x + dx + boxX - featureWidth);
+                            __m128 difference_vector = _mm_sub_ps(left_vector, right_vector);
                             //float difference = left[leftY * imageWidth + leftX] - right[rightY * imageWidth + rightX];
                             squaredDifference_vector = _mm_add_ps(squaredDifference_vector, 
                                 _mm_mul_ps(difference_vector, difference_vector));
@@ -111,7 +111,7 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
                         }
 
                         // tail case
-                        for (int i = (featureWidth + featureWidth) / 4 * 4; i <= featureWidth + featureWidth; i++)
+                        for (int i = (featureWidth + featureWidth) / 4 * 4 + 1; i <= featureWidth + featureWidth; i++)
                         {
                             int leftX = x + i - featureWidth;
                             int rightX = x + dx + i - featureWidth;
