@@ -20,9 +20,8 @@
 // Implements the displacement function
 float displacementNaive2(int dx, int dy)
 {
-    float squaredDisplacement = dx * dx + dy * dy;
-    float displacement = sqrt(squaredDisplacement);
-    return displacement;
+    //float squaredDisplacement = dx * dx + dy * dy;
+    return sqrt(dx * dx + dy * dy);
 }
 
 void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth, int imageHeight, int featureWidth, int featureHeight, int maximumDisplacement)
@@ -41,10 +40,8 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
     //         depth[y * imageWidth + x] = 0;
     //     }
     // }
-    float minimumSquaredDifference = -1;
-    int minimumDy = 0;
-    int minimumDx = 0;
-    #pragma omp parallel for private(minimumSquaredDifference, minimumDx, minimumDy)
+
+    #pragma omp parallel for
     for (int y = 0; y < imageHeight; y++)
     {
         for (int x = 0; x < imageWidth; x++)
@@ -56,7 +53,9 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
                 continue;
             }
 
-            
+            float minimumSquaredDifference = -1;
+            int minimumDy = 0;
+            int minimumDx = 0;
 
             /* Iterate through all feature boxes that fit inside the maximum displacement box. 
                centered around the current pixel. */
