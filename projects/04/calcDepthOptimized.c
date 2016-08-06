@@ -60,7 +60,7 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
 
 
 
-    //#pragma omp parallel for
+    #pragma omp parallel for collapse(2)
     for (int y = 0; y < imageHeight; y++)
     {
         for (int x = 0; x < imageWidth; x++)
@@ -97,7 +97,7 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
                     {
                         int leftY = y + boxY;
                         int rightY = y + dy + boxY;
-                        for (int boxX = 0; boxX <= (featureWidth + featureWidth) / 4 * 4; boxX += 4)
+                        for (int boxX = 0; boxX < (featureWidth + featureWidth) / 4 * 4; boxX += 4)
                         {
                             //int leftX = x + boxX;
                             //int rightX = x + dx + boxX;
@@ -111,7 +111,7 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
                         }
 
                         // tail case
-                        for (int i = (featureWidth + featureWidth) / 4 * 4 + 1; i <= featureWidth + featureWidth; i++)
+                        for (int i = (featureWidth + featureWidth) / 4 * 4; i <= featureWidth + featureWidth; i++)
                         {
                             int leftX = x + i - featureWidth;
                             int rightX = x + dx + i - featureWidth;
