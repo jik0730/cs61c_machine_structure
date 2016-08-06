@@ -106,7 +106,7 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
                             __m128i difference_vector = _mm_sub_epi32(left_vector, right_vector);
                             //float difference = left[leftY * imageWidth + leftX] - right[rightY * imageWidth + rightX];
                             squaredDifference_vector = _mm_add_epi32(squaredDifference_vector, 
-                                _mm_mullo_epi32(difference_vector, difference_vector));
+                                _mm_mul_ps(difference_vector, difference_vector));
                             //squaredDifference += difference * difference;
                         }
 
