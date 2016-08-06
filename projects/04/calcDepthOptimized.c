@@ -89,7 +89,7 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
                     }
 
                     float squaredDifference = 0;
-                    __m128i squaredDifference_vector = _mm_setzero_si128()
+                    __m128i squaredDifference_vector = _mm_setzero_si128();
 
                     /* Sum the squared difference within a box of +/- featureHeight and +/- featureWidth. */
                     // #pragma omp reduction(+:squaredDifference)
