@@ -52,6 +52,7 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
     //     }
     // }
     int y;
+    #pragma omp parallel for private(y)
     for (y = 0; y < imageHeight; y += 4) {
         if (y + 4 > imageHeight) break;
         int x;
@@ -96,8 +97,6 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
         }
     }
 
-    // int endX = imageWidth - featureWidth;
-    // int endY = imageHeight - featureHeight;
     //#pragma omp parallel for collapse(2) schedule(dynamic)
     for (int y = featureHeight; y < imageHeight - featureHeight; y++)
     {
@@ -109,18 +108,12 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
 
             /* Iterate through all feature boxes that fit inside the maximum displacement box. 
                centered around the current pixel. */
-            #pragma omp parallel for private(minimumSquaredDifference, minimumDy, minimumDx) schedule(dynamic)
+            //#pragma omp parallel for private(minimumSquaredDifference, minimumDy, minimumDx) schedule(dynamic)
             for (int dy = MAX(-maximumDisplacement, featureHeight - y); dy <= MIN(maximumDisplacement, imageHeight - featureHeight - y - 1); dy++)
             {
                 for (int dx = MAX(-maximumDisplacement, featureWidth - x); dx <= MIN(maximumDisplacement, imageWidth - featureWidth - x - 1); dx++)
                 {
                     /* Skip feature boxes that dont fit in the displacement box. */
-                    //y + dy - featureHeight < 0 || y + dy + featureHeight >= imageHeight || 
-                    // if (x + dx - featureWidth < 0 || x + dx + featureWidth >= imageWidth)
-                    // {
-                    //     continue;
-                    // }
-
                     float squaredDifference = 0;
                     __m128 squaredDifference_vector = _mm_setzero_ps();
 
