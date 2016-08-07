@@ -97,7 +97,7 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
             for ( unsigned int x = 0; x < featureWidth; x++) {
                 depth[y * imageWidth + x] = 0;
             }
-            for ( unsigned int x = imageWidth - featureWidth; x < imageWidth; x++) {
+            for (  int x = imageWidth - featureWidth; x < imageWidth; x++) {
                 depth[y * imageWidth + x] = 0;
             }
         }
@@ -105,9 +105,9 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
 
 
     #pragma omp parallel for collapse(2) schedule(dynamic)
-    for ( unsigned int y = featureHeight; y < imageHeight - featureHeight; y++)
+    for (  int y = featureHeight; y < imageHeight - featureHeight; y++)
     {
-        for ( unsigned int x = featureWidth; x < imageWidth - featureWidth; x++)
+        for (  int x = featureWidth; x < imageWidth - featureWidth; x++)
         {   
             float minimumSquaredDifference = -1;
             int minimumDy = 0;
