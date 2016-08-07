@@ -83,7 +83,7 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
         for (int x = 0; x < imageWidth; x++)
         {   
             /* Set the depth to 0 if looking at edge of the image where a feature box cannot fit. */
-            if ((y < featureHeight) || (y >= imageHeight - featureHeight) || (x < featureWidth) || (x >= imageWidth - featureWidth))
+            if ((x < featureWidth) || (x >= imageWidth - featureWidth))
             {
                 depth[y * imageWidth + x] = 0;
                 continue;
