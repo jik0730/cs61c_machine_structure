@@ -61,15 +61,15 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
 
     //     }
     // }
-    for (int y = 0; y < imageHeight; y++)
+    for (register unsigned int y = 0; y < imageHeight; y++)
     {
         if ((y < featureHeight) || (y >= imageHeight - featureHeight)) {
-            for (int x = 0; x < imageWidth / 4 * 4; x += 4) {
+            for (register unsigned int x = 0; x < imageWidth / 4 * 4; x += 4) {
                 _mm_storeu_ps((depth + y * imageWidth + x), _mm_setzero_ps());
                 //depth[y * imageWidth + x] = 0;
             }
 
-            for (int i = imageWidth / 4 * 4; i < imageWidth; i++)
+            for (register unsigned int i = imageWidth / 4 * 4; i < imageWidth; i++)
             {
                 depth[y * imageWidth + i] = 0;
             }
@@ -94,25 +94,24 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
             //     depth[y * imageWidth + i] = 0;
             // }
 
-            for (int x = 0; x < featureWidth; x++) {
+            for (register unsigned int x = 0; x < featureWidth; x++) {
                 depth[y * imageWidth + x] = 0;
             }
-            for (int x = imageWidth - featureWidth; x < imageWidth; x++) {
+            for (register unsigned int x = imageWidth - featureWidth; x < imageWidth; x++) {
                 depth[y * imageWidth + x] = 0;
             }
         }
     }
 
-    float minimumSquaredDifference = -1;
-    int minimumDy = 0;
-    int minimumDx = 0;
 
-    #pragma omp parallel for private(minimumSquaredDifference, minimumDy, minimumDx) collapse(2) schedule(dynamic)
-    for (int y = featureHeight; y < imageHeight - featureHeight; y++)
+    #pragma omp parallel for collapse(2) schedule(dynamic)
+    for (register unsigned int y = featureHeight; y < imageHeight - featureHeight; y++)
     {
-        for (int x = featureWidth; x < imageWidth - featureWidth; x++)
+        for (register unsigned int x = featureWidth; x < imageWidth - featureWidth; x++)
         {   
-            
+            float minimumSquaredDifference = -1;
+            int minimumDy = 0;
+            int minimumDx = 0;
 
             /* Iterate through all feature boxes that fit inside the maximum displacement box. 
                centered around the current pixel. */
