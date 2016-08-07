@@ -53,11 +53,11 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
     // }
     int y;
     #pragma omp parallel for private(y)
-    for (y = 0; y < imageHeight; y += 4) {
-        if (y + 4 > imageHeight) break;
+    for (y = 0; y < imageHeight / 4 * 4; y += 4) {
+        //if (y + 4 > imageHeight) break;
         int x;
-        for (x = 0; x < imageWidth; x += 16) {
-            if (x + 16 > imageWidth) break;
+        for (x = 0; x < imageWidth / 16 * 16; x += 16) {
+            //if (x + 16 > imageWidth) break;
             _mm_storeu_ps((depth + y * imageWidth + x), _mm_setzero_ps());
             _mm_storeu_ps((depth + (y+1) * imageWidth + x), _mm_setzero_ps());
             _mm_storeu_ps((depth + (y+2) * imageWidth + x), _mm_setzero_ps());
