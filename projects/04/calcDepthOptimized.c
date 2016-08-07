@@ -79,6 +79,10 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
             depth[(y+1) * imageWidth + x] = 0;
             depth[(y+2) * imageWidth + x] = 0;
             depth[(y+3) * imageWidth + x] = 0;
+            depth[(y+4) * imageWidth + x] = 0;
+            depth[(y+5) * imageWidth + x] = 0;
+            depth[(y+6) * imageWidth + x] = 0;
+            depth[(y+7) * imageWidth + x] = 0;
         }
     }
 
