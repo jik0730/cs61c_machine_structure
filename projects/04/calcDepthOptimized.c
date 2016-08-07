@@ -133,7 +133,7 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
                 }
                 else
                 {
-                    depth[y * imageWidth + x] = displacementNaive2(minimumDx, minimumDy);
+                    depth[y * imageWidth + x] = sqrt(minimumDx * minimumDx + minimumDy * minimumDy);
                 }
             }
             else
