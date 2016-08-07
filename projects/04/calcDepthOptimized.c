@@ -65,16 +65,16 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
 
             /* Iterate through all feature boxes that fit inside the maximum displacement box. 
                centered around the current pixel. */
-            for (int dy = MAX(-maximumDisplacement, featureHeight - y); dy <= MIN(maximumDisplacement, imageHeight - featureHeight - y); dy++)
+            for (int dy = MAX(-maximumDisplacement, featureHeight - y); dy <= MIN(maximumDisplacement, imageHeight - featureHeight - y - 1); dy++)
             {
-                for (int dx = -maximumDisplacement; dx <= maximumDisplacement; dx++)
+                for (int dx = MAX(-maximumDisplacement, featureWidth - x); dx <= MIN(maximumDisplacement, imageWidth - featureWidth - x - 1); dx++)
                 {
                     /* Skip feature boxes that dont fit in the displacement box. */
                     //y + dy - featureHeight < 0 || y + dy + featureHeight >= imageHeight || 
-                    if (x + dx - featureWidth < 0 || x + dx + featureWidth >= imageWidth)
-                    {
-                        continue;
-                    }
+                    // if (x + dx - featureWidth < 0 || x + dx + featureWidth >= imageWidth)
+                    // {
+                    //     continue;
+                    // }
 
                     float squaredDifference = 0;
                     __m128 squaredDifference_vector = _mm_setzero_ps();
