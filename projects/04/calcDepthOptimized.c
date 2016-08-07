@@ -15,7 +15,7 @@
 
 #include "calcDepthOptimized.h"
 #include "calcDepthNaive.h"
-#include <math.h>
+#define MAX(a,b) (((a)>(b))?(a):(b))
 
 /* DO NOT CHANGE ANYTHING ABOVE THIS LINE. */
 // Implements the displacement function
@@ -74,7 +74,7 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
         }
     }
 
-    int start = max(0, imageHeight - featureHeight);
+    int start = MAX(0, imageHeight - featureHeight);
     for (int y = start; y < imageHeight; y++)
     {
         for (int x = 0; x < imageWidth / 4 * 4; x += 4) {
