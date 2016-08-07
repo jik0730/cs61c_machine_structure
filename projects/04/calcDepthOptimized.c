@@ -33,22 +33,31 @@ float compareDisplacement(int dx, int dy) {
 void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth, int imageHeight, int featureWidth, int featureHeight, int maximumDisplacement)
 {
     /* The two outer for loops iterate through each pixel */
-    for (int y = 0; y < imageHeight; y++)
-    {
-        if ((y < featureHeight) || (y >= imageHeight - featureHeight)) {
-            for (int x = 0; x < imageWidth / 4 * 4; x += 4) {
-                _mm_storeu_ps((depth + y * imageWidth + x), _mm_setzero_ps());
-            }
-            for (int i = imageWidth / 4 * 4; i < imageWidth; i++) {
-                depth[y * imageWidth + i] = 0;
-            }
-        } else {
-            for (int x = 0; x < featureWidth; x++) {
-                depth[y * imageWidth + x] = 0;
-            }
-            for (int x = imageWidth - featureWidth; x < imageWidth; x++) {
-                depth[y * imageWidth + x] = 0;
-            }
+    // for (int y = 0; y < imageHeight; y++)
+    // {
+    //     if ((y < featureHeight) || (y >= imageHeight - featureHeight)) {
+    //         for (int x = 0; x < imageWidth / 4 * 4; x += 4) {
+    //             _mm_storeu_ps((depth + y * imageWidth + x), _mm_setzero_ps());
+    //         }
+    //         for (int i = imageWidth / 4 * 4; i < imageWidth; i++) {
+    //             depth[y * imageWidth + i] = 0;
+    //         }
+    //     } else {
+    //         for (int x = 0; x < featureWidth; x++) {
+    //             depth[y * imageWidth + x] = 0;
+    //         }
+    //         for (int x = imageWidth - featureWidth; x < imageWidth; x++) {
+    //             depth[y * imageWidth + x] = 0;
+    //         }
+    //     }
+    // }
+
+    for (int y = 0; y < imageHeight; y++) {
+        for (int x = 0; x < imageWidth / 4 * 4; x += 4) {
+            _mm_storeu_ps((depth + y * imageWidth + x), _mm_setzero_ps());
+        }
+        for (int i = imageWidth / 4 * 4; i < imageWidth; i++) {
+            depth[y * imageWidth + i] = 0;
         }
     }
 
