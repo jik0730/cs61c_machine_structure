@@ -31,25 +31,18 @@ float compareDisplacement(int dx, int dy) {
 void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth, int imageHeight, int featureWidth, int featureHeight, int maximumDisplacement)
 {
     /* The two outer for loops iterate through each pixel */
-    #pragma omp parallel sections
-    {
-        #pragma omp section
-        {
-            for (int y = 0; y < featureHeight; y++) {
-                for (int x = 0; x < imageWidth; x++) {
-                    depth[y * imageWidth + x] = 0;
-                }
-            }
-        }
-        #pragma omp section
-        {
-            for (int y = imageHeight - featureHeight; y < imageHeight; y++) {
-                for (int x = 0; x < imageWidth; x++) {
-                    depth[y * imageWidth + x] = 0;
-                }
-            }
+    #pragma omp parallel for
+    for (int y = 0; y < imageWidth; y++) {
+        if (y >= featureWidth || y < imageHeight - featureHeight) continue;
+        for (int x = 0; x < imageWidth; x++) {
+            depth[y * imageWidth + x] = 0;
         }
     }
+    // for (int y = imageHeight - featureHeight; y < imageHeight; y++) {
+    //     for (int x = 0; x < imageWidth; x++) {
+    //         depth[y * imageWidth + x] = 0;
+    //     }
+    // }
 
     // for (int y = 0; y < imageHeight; y += 4) {
     //     for (int x = 0; x < imageWidth; x += 4) {
