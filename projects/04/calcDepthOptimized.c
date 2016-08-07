@@ -159,9 +159,11 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
 
             /* Iterate through all feature boxes that fit inside the maximum displacement box. 
                centered around the current pixel. */
-            for (int dy = MAX(-maximumDisplacement, featureHeight - y); dy <= MIN(maximumDisplacement, imageHeight - featureHeight - y - 1); dy++)
+            int a = MIN(maximumDisplacement, imageHeight - featureHeight - y - 1);
+            int b = MIN(maximumDisplacement, imageWidth - featureWidth - x - 1);
+            for (int dy = MAX(-maximumDisplacement, featureHeight - y); dy <= a; dy++)
             {
-                for (int dx = MAX(-maximumDisplacement, featureWidth - x); dx <= MIN(maximumDisplacement, imageWidth - featureWidth - x - 1); dx++)
+                for (int dx = MAX(-maximumDisplacement, featureWidth - x); dx <= b; dx++)
                 {
                     float squaredDifference = 0;
 
