@@ -61,15 +61,15 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
 
     //     }
     // }
-    for (register unsigned int y = 0; y < imageHeight; y++)
+    for ( unsigned int y = 0; y < imageHeight; y++)
     {
         if ((y < featureHeight) || (y >= imageHeight - featureHeight)) {
-            for (register unsigned int x = 0; x < imageWidth / 4 * 4; x += 4) {
+            for ( unsigned int x = 0; x < imageWidth / 4 * 4; x += 4) {
                 _mm_storeu_ps((depth + y * imageWidth + x), _mm_setzero_ps());
                 //depth[y * imageWidth + x] = 0;
             }
 
-            for (register unsigned int i = imageWidth / 4 * 4; i < imageWidth; i++)
+            for ( unsigned int i = imageWidth / 4 * 4; i < imageWidth; i++)
             {
                 depth[y * imageWidth + i] = 0;
             }
@@ -94,10 +94,10 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
             //     depth[y * imageWidth + i] = 0;
             // }
 
-            for (register unsigned int x = 0; x < featureWidth; x++) {
+            for ( unsigned int x = 0; x < featureWidth; x++) {
                 depth[y * imageWidth + x] = 0;
             }
-            for (register unsigned int x = imageWidth - featureWidth; x < imageWidth; x++) {
+            for ( unsigned int x = imageWidth - featureWidth; x < imageWidth; x++) {
                 depth[y * imageWidth + x] = 0;
             }
         }
@@ -105,9 +105,9 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
 
 
     #pragma omp parallel for collapse(2) schedule(dynamic)
-    for (register unsigned int y = featureHeight; y < imageHeight - featureHeight; y++)
+    for ( unsigned int y = featureHeight; y < imageHeight - featureHeight; y++)
     {
-        for (register unsigned int x = featureWidth; x < imageWidth - featureWidth; x++)
+        for ( unsigned int x = featureWidth; x < imageWidth - featureWidth; x++)
         {   
             float minimumSquaredDifference = -1;
             int minimumDy = 0;
