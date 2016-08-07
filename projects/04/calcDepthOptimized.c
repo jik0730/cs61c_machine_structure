@@ -15,6 +15,7 @@
 
 #include "calcDepthOptimized.h"
 #include "calcDepthNaive.h"
+#include <math.h>
 
 /* DO NOT CHANGE ANYTHING ABOVE THIS LINE. */
 // Implements the displacement function
