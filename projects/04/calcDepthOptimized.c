@@ -96,7 +96,7 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
         }
     }
 
-    #pragma omp parallel for firstprivate(imageWidth, imageHeight, featureHeight, featureWidth, maximumDisplacement)
+    #pragma omp parallel for lastprivate(imageWidth, imageHeight, featureHeight, featureWidth, maximumDisplacement)
     for (int y = featureHeight; y < imageHeight - featureHeight; y++)
     {
         for (int x = featureWidth; x < imageWidth - featureWidth; x++)
