@@ -57,10 +57,14 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
         int x;
         for (x = 0; x < imageWidth; x += 4) {
             if (x + 4 > imageWidth) break;
-            _mm_storeu_ps((depth + y * imageWidth + x), _mm_setzero_ps());
-            _mm_storeu_ps((depth + (y+1) * imageWidth + x), _mm_setzero_ps());
-            _mm_storeu_ps((depth + (y+2) * imageWidth + x), _mm_setzero_ps());
-            _mm_storeu_ps((depth + (y+3) * imageWidth + x), _mm_setzero_ps());
+            // _mm_storeu_ps((depth + y * imageWidth + x), _mm_setzero_ps());
+            // _mm_storeu_ps((depth + (y+1) * imageWidth + x), _mm_setzero_ps());
+            // _mm_storeu_ps((depth + (y+2) * imageWidth + x), _mm_setzero_ps());
+            // _mm_storeu_ps((depth + (y+3) * imageWidth + x), _mm_setzero_ps());
+            _mm_storeu_ps((depth + y * imageWidth + x), 
+                _mm_storeu_ps((depth + (y+1) * imageWidth + x), 
+                    _mm_storeu_ps((depth + (y+2) * imageWidth + x), 
+                        _mm_storeu_ps((depth + (y+3) * imageWidth + x), _mm_setzero_ps()))));
         }
         for (; x < imageWidth; x++) {
             depth[y * imageWidth + x] = 0;
@@ -71,11 +75,13 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
     }
 
     for (; y < imageHeight; y++) {
-        for (int x = 0; x < imageWidth / 4 * 4; x += 4) {
+        int x;
+        for (x = 0; x < imageWidth; x += 4) {
+            if (x + 4 > imageWidth) break;
             _mm_storeu_ps((depth + y * imageWidth + x), _mm_setzero_ps());
         }
-        for (int i = imageWidth / 4 * 4; i < imageWidth; i++) {
-            depth[y * imageWidth + i] = 0;
+        for (; x < imageWidth; x++) {
+            depth[y * imageWidth + x] = 0;
         }
     }
 
