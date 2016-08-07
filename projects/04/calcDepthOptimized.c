@@ -16,6 +16,7 @@
 #include "calcDepthOptimized.h"
 #include "calcDepthNaive.h"
 #define MAX(a,b) (((a)>(b))?(a):(b))
+#define MIN(a,b) (((a)<(b))?(a):(b))
 
 /* DO NOT CHANGE ANYTHING ABOVE THIS LINE. */
 // Implements the displacement function
@@ -64,7 +65,7 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
 
             /* Iterate through all feature boxes that fit inside the maximum displacement box. 
                centered around the current pixel. */
-            for (int dy = -maximumDisplacement; dy <= maximumDisplacement; dy++)
+            for (int dy = MAX(-maximumDisplacement, featureHeight - y); dy <= MIN(maximumDisplacement, imageHeight - featureHeight - y); dy++)
             {
                 for (int dx = -maximumDisplacement; dx <= maximumDisplacement; dx++)
                 {
