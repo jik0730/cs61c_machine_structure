@@ -65,14 +65,16 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
 
 
     #pragma omp parallel for collapse(2) schedule(dynamic)
-    for (int y = 0; y < imageHeight; y++)
+    for (int y = featureHeight; y < imageHeight - featureHeight; y++)
     {
-        // if ((y < featureHeight) || (y >= imageHeight - featureHeight)) {
-        //     for (int x = 0; x < imageWidth; x++) {
-        //         depth[y * imageWidth + x] = 0;
-        //     }
-        //     continue;
-        // }
+        if ((y < featureHeight) || (y >= imageHeight - featureHeight)) {
+            for (int x = 0; x < imageWidth; x += 4) {
+                _mm_storeu_ps((depth + y * imageWidth + x), _mm_setzero_ps());
+                //depth[y * imageWidth + x] = 0;
+            }
+
+            continue;
+        }
         for (int x = 0; x < imageWidth; x++)
         {   
             /* Set the depth to 0 if looking at edge of the image where a feature box cannot fit. */
