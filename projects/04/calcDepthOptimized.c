@@ -65,7 +65,7 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
 
 
     #pragma omp parallel for collapse(2) schedule(dynamic)
-    for (int y = featureHeight; y < imageHeight - featureHeight; y++)
+    for (int y = 0; y < imageHeight; y++)
     {
         // if ((y < featureHeight) || (y >= imageHeight - featureHeight)) {
         //     for (int x = 0; x < imageWidth; x++) {
