@@ -73,6 +73,26 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
             {
                 depth[y * imageWidth + i] = 0;
             }
+        } else {
+            for (int x = 0; x < featureWidth / 4 * 4; x += 4) {
+                _mm_storeu_ps((depth + y * imageWidth + x), _mm_setzero_ps());
+                //depth[y * imageWidth + x] = 0;
+            }
+
+            for (int i = featureWidth / 4 * 4; i < featureWidth; i++)
+            {
+                depth[y * imageWidth + i] = 0;
+            }
+
+            for (int x = imageWidth - featureWidth; x < imageWidth / 4 * 4; x += 4) {
+                _mm_storeu_ps((depth + y * imageWidth + x), _mm_setzero_ps());
+                //depth[y * imageWidth + x] = 0;
+            }
+
+            for (int i = imageWidth / 4 * 4; i < imageWidth; i++)
+            {
+                depth[y * imageWidth + i] = 0;
+            }
         }
     }
 
@@ -93,14 +113,14 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
 
         //     continue;
         // }
-        for (int x = 0; x < imageWidth; x++)
+        for (int x = featureWidth; x < imageWidth - featureWidth; x++)
         {   
             /* Set the depth to 0 if looking at edge of the image where a feature box cannot fit. */
-            if ((x < featureWidth) || (x >= imageWidth - featureWidth))
-            {
-                depth[y * imageWidth + x] = 0;
-                continue;
-            }
+            // if ((x < featureWidth) || (x >= imageWidth - featureWidth))
+            // {
+            //     depth[y * imageWidth + x] = 0;
+            //     continue;
+            // }
 
             float minimumSquaredDifference = -1;
             int minimumDy = 0;
