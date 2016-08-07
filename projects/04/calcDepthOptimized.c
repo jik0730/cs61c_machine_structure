@@ -73,31 +73,40 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
             {
                 depth[y * imageWidth + i] = 0;
             }
-        } else {
-            // for (int x = 0; x < featureWidth / 4 * 4; x += 4) {
-            //     _mm_storeu_ps((depth + y * imageWidth + x), _mm_setzero_ps());
-            //     //depth[y * imageWidth + x] = 0;
-            // }
+        }
+        // } else {
+        //     // for (int x = 0; x < featureWidth / 4 * 4; x += 4) {
+        //     //     _mm_storeu_ps((depth + y * imageWidth + x), _mm_setzero_ps());
+        //     //     //depth[y * imageWidth + x] = 0;
+        //     // }
 
-            // for (int i = featureWidth / 4 * 4; i < featureWidth; i++)
-            // {
-            //     depth[y * imageWidth + i] = 0;
-            // }
+        //     // for (int i = featureWidth / 4 * 4; i < featureWidth; i++)
+        //     // {
+        //     //     depth[y * imageWidth + i] = 0;
+        //     // }
 
-            // for (int x = imageWidth - featureWidth; x < imageWidth / 4 * 4; x += 4) {
-            //     _mm_storeu_ps((depth + y * imageWidth + x), _mm_setzero_ps());
-            //     //depth[y * imageWidth + x] = 0;
-            // }
+        //     // for (int x = imageWidth - featureWidth; x < imageWidth / 4 * 4; x += 4) {
+        //     //     _mm_storeu_ps((depth + y * imageWidth + x), _mm_setzero_ps());
+        //     //     //depth[y * imageWidth + x] = 0;
+        //     // }
 
-            // for (int i = imageWidth / 4 * 4; i < imageWidth; i++)
-            // {
-            //     depth[y * imageWidth + i] = 0;
-            // }
+        //     // for (int i = imageWidth / 4 * 4; i < imageWidth; i++)
+        //     // {
+        //     //     depth[y * imageWidth + i] = 0;
+        //     // }
 
-            for (int x = 0; x < featureWidth; x++) {
-                depth[y * imageWidth + x] = 0;
-            }
-            for (int x = imageWidth - featureWidth; x < imageWidth; x++) {
+        //     for (int x = 0; x < featureWidth; x++) {
+        //         depth[y * imageWidth + x] = 0;
+        //     }
+        //     for (int x = imageWidth - featureWidth; x < imageWidth; x++) {
+        //         depth[y * imageWidth + x] = 0;
+        //     }
+        // }
+    }
+
+    for (int x = 0; x < imageWidth; x++) {
+        if ((x < featureWidth) || (x >= imageWidth - featureWidth)) {
+            for (int y = featureHeight; y < imageHeight - featureHeight; y++) {
                 depth[y * imageWidth + x] = 0;
             }
         }
