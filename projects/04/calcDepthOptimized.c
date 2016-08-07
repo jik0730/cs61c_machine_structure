@@ -33,24 +33,6 @@ float compareDisplacement(int dx, int dy) {
 void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth, int imageHeight, int featureWidth, int featureHeight, int maximumDisplacement)
 {
     /* The two outer for loops iterate through each pixel */
-    // for (int y = 0; y < imageHeight; y++)
-    // {
-    //     if ((y < featureHeight) || (y >= imageHeight - featureHeight)) {
-    //         for (int x = 0; x < imageWidth / 4 * 4; x += 4) {
-    //             _mm_storeu_ps((depth + y * imageWidth + x), _mm_setzero_ps());
-    //         }
-    //         for (int i = imageWidth / 4 * 4; i < imageWidth; i++) {
-    //             depth[y * imageWidth + i] = 0;
-    //         }
-    //     } else {
-    //         for (int x = 0; x < featureWidth; x++) {
-    //             depth[y * imageWidth + x] = 0;
-    //         }
-    //         for (int x = imageWidth - featureWidth; x < imageWidth; x++) {
-    //             depth[y * imageWidth + x] = 0;
-    //         }
-    //     }
-    // }
     int y;
     for (y = 0; y < imageHeight; y += 4) {
         if (y + 4 > imageHeight) break;
@@ -96,7 +78,7 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
         }
     }
 
-    #pragma omp parallel for lastprivate(imageWidth, imageHeight, featureHeight, featureWidth, maximumDisplacement)
+    #pragma omp parallel for firstprivate(imageWidth, imageHeight, featureHeight, featureWidth, maximumDisplacement)
     for (int y = featureHeight; y < imageHeight - featureHeight; y++)
     {
         for (int x = featureWidth; x < imageWidth - featureWidth; x++)
@@ -107,12 +89,10 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
 
             /* Iterate through all feature boxes that fit inside the maximum displacement box. 
                centered around the current pixel. */
-            //#pragma omp parallel for private(minimumSquaredDifference, minimumDy, minimumDx) schedule(dynamic)
             for (int dy = MAX(-maximumDisplacement, featureHeight - y); dy <= MIN(maximumDisplacement, imageHeight - featureHeight - y - 1); dy++)
             {
                 for (int dx = MAX(-maximumDisplacement, featureWidth - x); dx <= MIN(maximumDisplacement, imageWidth - featureWidth - x - 1); dx++)
                 {
-                    /* Skip feature boxes that dont fit in the displacement box. */
                     float squaredDifference = 0;
                     __m128 squaredDifference_vector = _mm_setzero_ps();
 
@@ -162,96 +142,10 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
             Set the value in the depth map. 
             If max displacement is equal to 0, the depth value is just 0.
             */
-            // if (minimumSquaredDifference != -1)
-            // {
-            //     if (maximumDisplacement == 0)
-            //     {
-            //         depth[y * imageWidth + x] = 0;
-            //     }
-            //     else
-            //     {
-            //         depth[y * imageWidth + x] = sqrt(minimumDx * minimumDx + minimumDy * minimumDy);
-            //     }
-            // }
-            // else
-            // {
-            //     depth[y * imageWidth + x] = 0;
-            // }
             if (minimumSquaredDifference != -1 && maximumDisplacement != 0)
             {
                 depth[y * imageWidth + x] = sqrt(minimumDx * minimumDx + minimumDy * minimumDy);
             }
         }
     }
-    // #pragma omp parallel for
-    // for (int y = featureHeight; y < imageHeight - featureHeight; y++)
-    // {
-    //     for (int x = featureWidth; x < imageWidth - featureWidth; x++)
-    //     {   
-    //         /* Set the depth to 0 if looking at edge of the image where a feature box cannot fit. */
-
-    //         float minimumSquaredDifference = -1;
-    //         int minimumDy = 0;
-    //         int minimumDx = 0;
-
-    //         /* Iterate through all feature boxes that fit inside the maximum displacement box. 
-    //            centered around the current pixel. */
-    //         for (int dy = MAX(-maximumDisplacement, featureHeight - y); dy <= MIN(maximumDisplacement, imageHeight - featureHeight - y - 1); dy++)
-    //         {
-    //             for (int dx = MAX(-maximumDisplacement, featureWidth - x); dx <= MIN(maximumDisplacement, imageHeight - featureHeight - y - 1); dx++)
-    //             {
-    //                 float squaredDifference = 0;
-
-    //                 /* Sum the squared difference within a box of +/- featureHeight and +/- featureWidth. */
-    //                 for (int boxY = -featureHeight; boxY <= featureHeight; boxY++)
-    //                 {
-    //                     for (int boxX = -featureWidth; boxX <= featureWidth; boxX++)
-    //                     {
-    //                         int leftX = x + boxX;
-    //                         int leftY = y + boxY;
-    //                         int rightX = x + dx + boxX;
-    //                         int rightY = y + dy + boxY;
-
-    //                         float difference = left[leftY * imageWidth + leftX] - right[rightY * imageWidth + rightX];
-    //                         squaredDifference += difference * difference;
-    //                     }
-    //                 }
-
-    //                 /* 
-    //                 Check if you need to update minimum square difference. 
-    //                 This is when either it has not been set yet, the current
-    //                 squared displacement is equal to the min and but the new
-    //                 displacement is less, or the current squared difference
-    //                 is less than the min square difference.
-    //                 */
-    //                 if ((minimumSquaredDifference == -1) || ((minimumSquaredDifference == squaredDifference) && (displacementNaive(dx, dy) < displacementNaive(minimumDx, minimumDy))) || (minimumSquaredDifference > squaredDifference))
-    //                 {
-    //                     minimumSquaredDifference = squaredDifference;
-    //                     minimumDx = dx;
-    //                     minimumDy = dy;
-    //                 }
-    //             }
-    //         }
-
-    //         /* 
-    //         Set the value in the depth map. 
-    //         If max displacement is equal to 0, the depth value is just 0.
-    //         */
-    //         if (minimumSquaredDifference != -1)
-    //         {
-    //             if (maximumDisplacement == 0)
-    //             {
-    //                 depth[y * imageWidth + x] = 0;
-    //             }
-    //             else
-    //             {
-    //                 depth[y * imageWidth + x] = displacementNaive(minimumDx, minimumDy);
-    //             }
-    //         }
-    //         else
-    //         {
-    //             depth[y * imageWidth + x] = 0;
-    //         }
-    //     }
-    // }
 }
