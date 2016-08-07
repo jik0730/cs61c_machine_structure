@@ -70,7 +70,8 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
                 for (int dx = -maximumDisplacement; dx <= maximumDisplacement; dx++)
                 {
                     /* Skip feature boxes that dont fit in the displacement box. */
-                    if (y + dy - featureHeight < 0 || y + dy + featureHeight >= imageHeight || x + dx - featureWidth < 0 || x + dx + featureWidth >= imageWidth)
+                    //y + dy - featureHeight < 0 || y + dy + featureHeight >= imageHeight || 
+                    if (x + dx - featureWidth < 0 || x + dx + featureWidth >= imageWidth)
                     {
                         continue;
                     }
