@@ -8,6 +8,26 @@
 #include "calcDepthNaive.h"
 #include "utils.h"
 
+
+// 임의 추가
+// include SSE intrinsics
+#if defined(_MSC_VER)
+#include <intrin.h>
+#elif defined(__GNUC__) && (defined(__x86_64__) || defined(__i386__))
+#include <x86intrin.h>
+#endif
+
+// include OpenMP
+#if !defined(_MSC_VER)
+#include <pthread.h>
+#endif
+#include <omp.h>
+
+#include "calcDepthOptimized.h"
+#include "calcDepthNaive.h"
+
+
+
 #define ABS(x) (((x) < 0) ? (-(x)) : (x))
 
 // Implements the displacement function
@@ -21,7 +41,8 @@ float displacementNaive(int dx, int dy)
 void calcDepthNaive(float *depth, float *left, float *right, int imageWidth, int imageHeight, int featureWidth, int featureHeight, int maximumDisplacement)
 {
 
-	/* The two outer for loops iterate through each pixel */
+	/* The two outer for loops iterate through each pixel */ㄹ
+	#pragma omp parallel for
 	for (int y = 0; y < imageHeight; y++)
 	{
 		for (int x = 0; x < imageWidth; x++)
