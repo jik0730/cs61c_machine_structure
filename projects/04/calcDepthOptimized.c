@@ -117,7 +117,6 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
                         int rightY = y + dy + boxY;
                         for (int boxX = 0; boxX < (featureWidth + featureWidth) / 4 * 4; boxX += 4)
                         {
-                            #pragma omp barrier
                             __m128 left_vector = _mm_loadu_ps(left + leftY * imageWidth + x + boxX - featureWidth);
                             __m128 right_vector = _mm_loadu_ps(right + rightY * imageWidth + x + dx + boxX - featureWidth);
                             __m128 difference_vector = _mm_sub_ps(left_vector, right_vector);
