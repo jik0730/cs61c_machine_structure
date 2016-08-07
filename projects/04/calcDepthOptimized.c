@@ -149,20 +149,24 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
             Set the value in the depth map. 
             If max displacement is equal to 0, the depth value is just 0.
             */
-            if (minimumSquaredDifference != -1)
+            // if (minimumSquaredDifference != -1)
+            // {
+            //     if (maximumDisplacement == 0)
+            //     {
+            //         depth[y * imageWidth + x] = 0;
+            //     }
+            //     else
+            //     {
+            //         depth[y * imageWidth + x] = sqrt(minimumDx * minimumDx + minimumDy * minimumDy);
+            //     }
+            // }
+            // else
+            // {
+            //     depth[y * imageWidth + x] = 0;
+            // }
+            if (minimumSquaredDifference != -1 && maximumDisplacement != 0)
             {
-                if (maximumDisplacement == 0)
-                {
-                    depth[y * imageWidth + x] = 0;
-                }
-                else
-                {
-                    depth[y * imageWidth + x] = sqrt(minimumDx * minimumDx + minimumDy * minimumDy);
-                }
-            }
-            else
-            {
-                depth[y * imageWidth + x] = 0;
+                depth[y * imageWidth + x] = sqrt(minimumDx * minimumDx + minimumDy * minimumDy);
             }
         }
     }
