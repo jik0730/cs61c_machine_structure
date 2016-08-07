@@ -83,7 +83,7 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
 
     // int endX = imageWidth - featureWidth;
     // int endY = imageHeight - featureHeight;
-    #pragma omp parallel for collapse(2) schedule(dynamic)
+    //#pragma omp parallel for collapse(2) schedule(dynamic)
     for (int y = featureHeight; y < imageHeight - featureHeight; y++)
     {
         for (int x = featureWidth; x < imageWidth - featureWidth; x++)
@@ -113,8 +113,10 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
                     {
                         int leftY = y + boxY;
                         int rightY = y + dy + boxY;
-                        for (int boxX = 0; boxX < (featureWidth + featureWidth) / 4 * 4; boxX += 4)
+                        int boxX;
+                        for (boxX = 0; boxX < (featureWidth + featureWidth); boxX += 4)
                         {
+                            if (boxX + 4 > featureWidth + featureWidth) break;
                             __m128 left_vector = _mm_loadu_ps(left + leftY * imageWidth + x + boxX - featureWidth);
                             __m128 right_vector = _mm_loadu_ps(right + rightY * imageWidth + x + dx + boxX - featureWidth);
                             __m128 difference_vector = _mm_sub_ps(left_vector, right_vector);
@@ -123,9 +125,9 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
                         }
 
                         // tail case
-                        for (int i = (featureWidth + featureWidth) / 4 * 4; i <= featureWidth + featureWidth; i++)
+                        for (; boxX <= featureWidth + featureWidth; boxX++)
                         {
-                            float difference = left[(y + boxY) * imageWidth + (x + i - featureWidth)] - right[(y + dy + boxY) * imageWidth + (x + dx + i - featureWidth)];
+                            float difference = left[(y + boxY) * imageWidth + (x + boxX - featureWidth)] - right[(y + dy + boxY) * imageWidth + (x + dx + boxX - featureWidth)];
                             squaredDifference += difference * difference;
                         }
                     }
