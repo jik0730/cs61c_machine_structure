@@ -112,7 +112,7 @@ void calcDepthOptimized(float *depth, float *left, float *right, int imageWidth,
                     displacement is less, or the current squared difference
                     is less than the min square difference.
                     */
-                    if ((minimumSquaredDifference == -1) || ((minimumSquaredDifference == squaredDifference) && (compareDisplacement(dx, dy) < compareDisplacement(minimumDx, minimumDy))) || (minimumSquaredDifference > squaredDifference))
+                    if ((minimumSquaredDifference == -1) || ((minimumSquaredDifference == squaredDifference) && (dx * dx + dy * dy < minimumDx * minimumDx + minimumDy * minimumDy) || (minimumSquaredDifference > squaredDifference))
                     {
                         minimumSquaredDifference = squaredDifference;
                         minimumDx = dx;
